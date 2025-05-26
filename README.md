@@ -9,7 +9,7 @@ Benvenuti! Questa repository contiene i miei appunti personali sul Deep Learning
 - `chapters/`: cartella con i vari capitoli in `.tex`
 - `figure/`: immagini utilizzate negli appunti
 - `references.bib`: file BibTeX con tutte le citazioni
-- `output/appunti_deep_learning.pdf`: versione PDF compilata (opzionale)
+- `output/appunti_deep_learning.pdf`: versione PDF compilata
 
 📚 **Contenuti**
 - Introduzione al Deep Learning

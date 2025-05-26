@@ -1,0 +1,196 @@
+% ========================================
+% Classe del documento
+% ========================================
+\documentclass[a4paper,12pt]{book} % Documento in formato A4, corpo 12pt, stile "book"
+
+% ========================================
+% Font e codifica dei caratteri
+% ========================================
+\usepackage[T1]{fontenc}     % Codifica T1 per font con accenti corretti in output PDF
+\usepackage{lmodern}         % Font Latin Modern, migliore resa rispetto a Computer Modern
+
+% ========================================
+% Impostazioni di pagina
+% ========================================
+\usepackage{geometry}        % Controllo completo del layout di pagina
+\geometry{margin=1in, head=17.4pt} % Margini e altezza intestazione
+\setlength{\headheight}{17.4pt}    % Altezza dell'intestazione (necessaria per evitare warning)
+
+% ========================================
+% Matematica
+% ========================================
+\usepackage{amsmath, amssymb, sansmath} % Pacchetti AMS per formule matematiche avanzate + font sans-serif per la matematica
+
+% ========================================
+% Lingua e stile delle citazioni
+% ========================================
+\usepackage[italian]{babel} % Imposta l'italiano come lingua principale
+\usepackage{csquotes}       % Supporto avanzato per virgolette e citazioni
+
+% ========================================
+% Stile accademico (ArsClassica)
+% ========================================
+\usepackage{arsclassica}    % Stile tipografico elegante basato su KOMA-Script
+
+% ========================================
+% Grafica e disegno
+% ========================================
+\usepackage{graphicx}       % Inserimento di immagini
+\usepackage{tikz}           % Disegni vettoriali complessi
+\usetikzlibrary{patterns, positioning} % Librerie aggiuntive per TikZ (pattern e posizionamento)
+\usepackage{pgfplots}       % Creazione di grafici
+\usepackage{pgfplotstable}  % Importazione e visualizzazione di tabelle nei grafici
+\usepackage{subcaption}     % Sottodidascalie per immagini affiancate
+\usepackage{standalone}     % Compilazione di figure o tabelle in file separati
+
+% ========================================
+% Colori
+% ========================================
+\usepackage{color}          % Colori di base
+\usepackage{xcolor}         % Colori estesi, compatibile con TikZ
+
+% ========================================
+% Liste personalizzate
+% ========================================
+\usepackage{enumitem}       % Controllo avanzato sulla formattazione delle liste
+
+% ========================================
+% Box e codice
+% ========================================
+\usepackage{tcolorbox}      % Box colorati per evidenziare contenuti
+\usepackage{listings}       % Visualizzazione di codice sorgente (con evidenziazione sintassi)
+
+% ========================================
+% Tabelle avanzate
+% ========================================
+\usepackage{tabularx}       % Tabelle con larghezza automatica
+\usepackage{rotating}       % Rotazione di elementi (utile per tabelle larghe)
+\usepackage{booktabs}       % Migliore qualità tipografica nelle tabelle
+
+% ========================================
+% Icone
+% ========================================
+\usepackage{fontawesome5}   % Icone vettoriali FontAwesome 5
+
+% ========================================
+% Bibliografia
+% ========================================
+\usepackage{biblatex}       % Gestione della bibliografia moderna e flessibile
+\addbibresource{references.bib} % File .bib da cui pescare le citazioni
+
+% ========================================
+% Collegamenti ipertestuali
+% ========================================
+\usepackage{hyperref}       % Link cliccabili per riferimenti interni ed esterni
+
+% ========================================
+% Intestazioni e piè di pagina
+% ========================================
+\usepackage{scrlayer-scrpage} % Gestione di header e footer compatibile con KOMA-Script
+
+
+
+%Differenziale con la d dritta
+\newcommand{\diff}{\mathop{}\!\mathrm{d}}
+
+%Ambiente per i teoremi
+\newtheorem{Teorema}{Teorema}[section]
+\newtheorem{Osservazione}{Oss:}
+\newtheorem{Definizione}{Def:}[section]
+\newtheorem{Esempio}{Es:}
+
+%Ambiente per il framing generale
+\lstset{frameround=fttt,backgroundcolor=\color{lemonchiffon},language=Python,keywordstyle=\color{cadmiumorange},stringstyle=\color{green}}
+\usetikzlibrary{positioning, shapes.geometric, arrows, arrows.meta}
+\pgfplotsset{compat=1.18}
+
+%Ambiente per il coding
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{12} % per il grassetto
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{12}  % per il normale
+
+% Colori custom
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+\definecolor{champagne}{rgb}{0.97, 0.91, 0.81}
+\definecolor{cadmiumorange}{rgb}{0.93, 0.53, 0.18}
+\definecolor{cream}{rgb}{1.0, 0.99, 0.82}
+\definecolor{eggshell}{rgb}{0.94, 0.92, 0.84}
+\definecolor{lemonchiffon}{rgb}{1.0, 0.98, 0.8}
+\definecolor{darkpastelgreen}{rgb}{0.01, 0.75, 0.24}
+
+% Stile Python
+\newcommand\pythonstyle{\lstset{
+    language=Python,
+    basicstyle=\footnotesize\ttfamily,
+    morekeywords={self},              
+    keywordstyle=\color{cadmiumorange},
+    emph={MyNet,__init__, interp, sign},          
+    emphstyle=\color{deepgreen},    
+    stringstyle=\color{deepgreen},
+    frame=tb,                         
+    showstringspaces=false,
+    literate={_}{{\textunderscore}}1  % Gestisce l'underscore
+             {$}{{\ensuremath{\$}}}1  % Permette l'uso di $
+}}
+
+% Ambiente Python
+\lstnewenvironment{python}[1][]
+{
+    \pythonstyle
+    \lstset{
+        escapeinside={(*@}{@*)}
+    }
+}{}
+{}
+
+\title{\textbf{Appunti di Deep Learning}\\
+    \vspace{0.5cm}
+    {\LARGE Appunti del corso tenuto dal Professor Vito Walter Anelli}}
+\author{Domenico Calò}
+\date{A.A. 2024/2025}
+
+
+
+\begin{document}
+
+\begin{titlepage}
+    \begin{center}
+        \vspace*{2cm}
+        {\Huge \textbf{Appunti di Deep Learning}}\\
+        \vspace{0.5cm}
+        {\LARGE Appunti del corso tenuto dal Professor Vito Walter Anelli}
+        \vfill
+        \includegraphics[width=0.75\textwidth]{figure/dlogo.png}
+        \vfill
+        {\Large Domenico Calò}\\
+        \vspace{0.5cm}
+        {\large A.A. 2024/2025}
+        \vspace*{2cm}
+    \end{center}
+\end{titlepage}
+
+\include{chapters/intro}
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+
+\include{chapters/chapter1}
+\include{chapters/chapter2}
+\include{chapters/chapter3}
+\include{chapters/chapter4}
+\include{chapters/chapter5}
+\include{chapters/chapter6}
+\include{chapters/chapter7}
+\include{chapters/chapter8}
+\include{chapters/chapter9}
+\include{chapters/chapter10}
+\include{chapters/chapter11}
+\include{chapters/chapter12}
+\include{chapters/chapter13}
+\include{chapters/chapter14}
+\include{chapters/chapter15}
+\include{chapters/chapter16}
+\printbibliography
+\end{document}

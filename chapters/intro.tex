@@ -1,0 +1,54 @@
+
+\vspace*{\fill}
+
+\begin{center}
+    \textbf{Domenico Calò} \\
+    \textit{Appunti di Deep Learning} \\
+    Copyright~\textcopyright~2025
+\end{center}
+
+\vspace*{\fill}
+
+\renewcommand{\baselinestretch}{1.2}\normalsize
+
+\textsc{Colophon} \\
+Questo lavoro è stato realizzato con \LaTeX{} su Mac utilizzando il pacchetto \textsf{ArsClassica}, uno stile ispirato a \textit{Gli elementi dello stile tipografico} di Robert Bringhurst. \\\\I nomi commerciali, i loghi, i marchi registrati menzionati negli appunti appartengono ai rispettivi proprietari, i pacchetti e le relative documentazioni ai rispettivi autori, le immagini presenti in questi appunti sono maggiormente prese dal web e appartengono ai rispettivi creatori.\\\\In caso di necessità dell'effetuare segnalazioni per eventuali, refusi aggiunte o correzioni, non esitate a contattarmi.
+\vspace{1.5em}
+\textsc{Contatti} \\
+\faEnvelope[regular] \href{mailto:domenico.calo44@gmail.com}{\texttt{domenico.calo44@gmail.com}} · Contatta Domenico Calò
+\newpage
+\vspace*{\fill}
+
+\begin{center}
+    To ask the right question is harder than to answer it.\\
+    — Georg Cantor
+\end{center}
+
+\vspace*{\fill}
+\chapter*{Introduzione}
+
+Questa dispensa nasce come supporto organico e approfondito al corso di \textbf{Deep Learning} tenuto dal \textbf{Prof. Vito Walter Anelli} nel secondo semestre del primo anno della \textbf{Laurea Magistrale} in \textbf{Ingegneria Informatica} presso il \textbf{Politecnico di Bari}. Il materiale raccolto e rielaborato in queste pagine ha l’obiettivo di fornire una guida completa e strutturata a tutti gli argomenti trattati durante il corso, seguendo passo dopo passo l’evoluzione delle tematiche affrontate a lezione, e integrando dove necessario approfondimenti teorici, esempi pratici e riferimenti alla letteratura scientifica, non cercando di elevare in maniera eccessiva il linguaggio di trattazione, in modo tale da risultare quanto più accessibile a tutti. Il Deep Learning è ad oggi una delle branche più attive e rivoluzionarie dell’Intelligenza Artificiale, con applicazioni che spaziano dalla visione artificiale alla comprensione del linguaggio naturale, dalla generazione di contenuti alla modellazione di fenomeni complessi. Per questo motivo, la presente dispensa non si limita a una trattazione superficiale, ma propone un percorso progressivo e dettagliato che accompagna il lettore dalla comprensione delle fondamenta teoriche fino alle architetture più avanzate e recenti della ricerca contemporanea.
+
+Nel dettaglio, i capitoli che seguono coprono i seguenti macro-temi:
+\begin{itemize}
+    \item \textbf{Introduzione al Deep Learning}: origini, motivazioni, contesto storico e differenze rispetto al Machine Learning tradizionale;
+    \item \textbf{Architetture di base}: reti neurali feedforward, backpropagation e capacità di rappresentazione;
+    \item \textbf{Learning Representation}: apprendimento di rappresentazioni distribuite e significative;
+    \item \textbf{Funzioni di attivazione e di costo}: ruolo, forme comuni e impatto sull’ottimizzazione;
+    \item \textbf{Ottimizzatori}: algoritmi per la discesa del gradiente, tecniche avanzate e analisi della convergenza;
+    \item \textbf{Normalization Layers}: normalizzazione dei dati all’interno delle reti per migliorare la stabilità dell’apprendimento;
+    \item \textbf{Convolutional Neural Networks (CNN)}: architetture per il trattamento dei dati strutturati spazialmente (immagini);
+    \item\textbf{Recurrent Neural Networks (RNN)}: modelli sequenziali e gestione della memoria nel tempo;
+    \item\textbf{Generalizzazione e Overfitting}: tecniche e strategie per migliorare la capacità predittiva del modello su dati non visti;
+    \item\textbf{Autoencoder}: modelli non supervisionati per la compressione e la generazione dei dati;
+    \item\textbf{Generative Adversarial Networks (GAN)}: modelli generativi basati su apprendimento competitivo;
+    \item\textbf{Transformer}: architettura basata sull’attenzione che ha rivoluzionato l’elaborazione sequenziale;
+    \item\textbf{Modelli di Diffusione}: tecniche generative recenti, basate su processi stocastici inversi;
+    \item\textbf{Graph Neural Networks (GNN) e Graph Convolutional Networks (GCN)}: reti neurali estese a dati strutturati come grafi;
+\end{itemize}
+Ogni capitolo è pensato per essere il più auto-contenuto possibile, pur mantenendo connessioni logiche con gli altri argomenti, in modo da offrire al lettore sia una visione modulare che sistemica della disciplina. Gli argomenti più complessi sono accompagnati da esempi, schemi esplicativi e, ove necessario, approfondimenti matematici volti a chiarire i meccanismi interni dei modelli. Questa dispensa vuole dunque porsi come un ponte tra teoria e pratica, utile non solo per la preparazione all’esame ma anche utile per stimolare la curiosità altrui, ad approfondire alcune tematiche trattate, come accade nel Capitolo~\ref{cap:14} e nel Capitolo~\ref{cap:15}.
+
+
+\chapter*{Ringraziamenti}
+
+Ringrazio in primis Lorenzo Pantieri, il quale inconsapevolmente, ha arricchito le mie personali conoscenze di \LaTeX, facendomi innamorare di questo mondo, semplicemente grazie ad alcuni suoi commenti presenti all'interno del forum del Gruppo Utilizzatori Italiani di \TeX{} e \LaTeX, ancora più in generale mi permetto di ringraziare inoltre tutti gli utenti e tutti i membri dello staff, che rendono quel forum una risorsa stupenda e meravigliosa di approfondimento, questo è l'internet che ci meritiamo e che personalmente gradisco e spero che non sparisca mai. Mi permetto di ringraziare il Prof. Vito Walter Anelli, il quale è stato in grado di raggiungermi con la sua passione per la materia del Deep Learning portandomi a scrivere questi appunti, senza di lui tutto ciò non sarebbe nemmeno esistito. Un ringraziamento speciale va ai miei colleghi che mi hanno accompagnato nel mio percorso universitario e che mi hanno arricchito personalmente, in particolare: Luca Crispino, Ivan Belvito, Antonio Favuzzi, Vincenzo Gentile, Monica Avella, Marzia Capuano, Elena De Michele, Fabrizio Ficarella e Luigi Racamato. Infine ci tengo a ringraziare tutti i futuri lettori di questi appunti, augurandoli un buono studio.

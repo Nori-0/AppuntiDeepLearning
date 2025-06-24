@@ -26,6 +26,9 @@ Benvenuti! Questa repository contiene i miei appunti personali sul Deep Learning
 - Transformer
 - Modelli di Diffusione
 - Graph Neural Networks (GNN) e Graph Convolutional Networks (GCN)
+- Energy-Based Models
+- Flow Matching & Stable Diffusion 3
+- Advanced Multi Head Attention
 
 📜 **Licenza**
 Tutti i diritti riservati. Non è consentita la copia, modifica o distribuzione senza autorizzazione scritta.

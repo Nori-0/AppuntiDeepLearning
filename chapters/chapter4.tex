@@ -1,15 +1,14 @@
 \chapter{Learning Rappresentation}
-\section{Introduzione}
-Uno degli obiettivi fondamentali del Deep Learning è imparare rappresentazioni significative a partire da dei dati grezzi. Un buon modello di Deep Learning non si limita a classificare gli input, ma è in grado di riuscire a estrarre delle caratteristiche gerarchiche le quali semplificano notevolmente i compiti di analisi e previsione.
+Uno degli obiettivi del Deep Learning è imparare rappresentazioni significative a partire da dei dati grezzi. Un buon modello di Deep Learning, non si limita a classificare gli input, ma è in grado di estrarre delle caratteristiche gerarchiche le quali semplificano notevolmente i compiti di analisi e previsione.
 
 \section{Classificatori Lineari e i loro Limiti}
-I classificatori lineari, i quali solitamente ci siamo trovati durante il corso di Machine Learning a interfacciarci, suddividono lo spazio degli input in due regioni separate da un iperpiano. Tuttavia, questa soluzione risulta essere molto limitata:
+I classificatori lineari, visti durante il corso di Machine Learning, suddividono lo spazio degli input in due regioni separate tramite un iperpiano. Questa soluzione però risulta essere molto limitata per due motivi:
 \begin{itemize}
     \item Non è in grado di gestire problemi con dati non linearmente separabili;
     \item La probabilità che una distribuzione casuale di punti $P$ sia separabile linearmente diminuisce all'aumentare della dimensionalità $N$ nel momento in cui $P \ge N$ (Teorema di Cover, 1966).
 \end{itemize}
 
-Per forza di cose nel caso in cui andassimo ad aumentare la dimensione di $N$ per cercare di arginare il problema, a causa del teorema di Cover dobbiamo fare anche attenzione anche alla \textit{Curse of Dimensionality}, la quale è anch'essa campo di studio.
+Se provassimo ad aumentare la dimensione di $N$ per cercare di arginare il problema, a causa del teorema di Cover dobbiamo non ignorare la problematica della \textit{Curse of Dimensionality}, la quale è anch'essa campo di studio.
 
 \begin{figure}[!ht]
     \centering
@@ -65,8 +64,8 @@ Per forza di cose nel caso in cui andassimo ad aumentare la dimensione di $N$ pe
     \label{fig:linear-vs-non-linear}
 \end{figure}
 
-\subsection{Soluzione: Rappresentazioni (Features)}
-Per superare i limiti dei classificatori lineari, ci sono varie metodologie, una di queste è quella approfondita attraverso l'esempio della funzione \textbf{XOR}, visto nel corso di Machine Learning, dove per definizione la funzione XOR genera dei dati che non sono linearmente separabili, ma attraverso la combinazione di modelli più semplici, i quali ci permettono di attura la separabilità lineare, riusciamo a ottenere la funzione complessiva attraverso una rete neurale. Di seguito alcune metodologie per far fronte ai limiti dei classificatori lineari:
+\subsection{La funzione XOR}
+Per superare i limiti dei classificatori lineari, si adottano diverse metodologie, una di queste è approfondita attraverso la funzione \textbf{XOR}, vista nel corso di Machine Learning, dove per definizione la funzione XOR genera dei dati che non sono linearmente separabili, ma attraverso la combinazione di modelli più semplici, riusciamo a ottenere la funzione complessiva attraverso una rete neurale con esiti linearmente separabili. Di seguito alcune metodologie per far fronte ai limiti dei classificatori lineari:
 \begin{itemize}
     \item Estrarre caratteristiche rilevanti dall'input grezzo;
     \item Trasformare i dati in una rappresentazione in cui la separabilità lineare sia più semplice;
@@ -76,20 +75,20 @@ Per superare i limiti dei classificatori lineari, ci sono varie metodologie, una
 \section{Metodi di Estrazione}
 Alcuni metodi per estrarre caratteristiche utili includono:
 \begin{itemize}
-    \item \textbf{Tiling dello spazio}: suddivisione dello spazio in regioni più piccole.
-    \item \textbf{Proiezioni casuali}: trasformazioni casuali per aumentare la dimensione dello spazio.
-    \item \textbf{Classificatori polinomiali}: utilizzo di combinazioni di variabili di input per migliorare la separabilità.
+    \item \textbf{Tiling dello spazio:} suddivisione dello spazio in regioni più piccole;
+    \item \textbf{Proiezioni casuali:} trasformazioni casuali per aumentare la dimensione dello spazio;
+    \item \textbf{Classificatori polinomiali:} utilizzo di combinazioni di variabili di input per migliorare la separabilità;
     \item \textbf{Macchine a kernel}: mappatura non lineare dei dati in uno spazio a più alta dimensionalità.
 \end{itemize}
 
-Generalmente l'idea alla base di tutte queste possibilità è quella di poter espandere le dimensioni della nostra rappresentazione, per far sì che i nostri dati risultino essere facilmente lineramente separabili.
+L'idea alla base di tutte queste possibilità è quella di poter espandere le dimensioni della nostra rappresentazione, portando i nostri dati ad essere lineramente separabili con facilità.
 
 \begin{Osservazione}
-    Ci potremmo chiedere del perché dovremmo usare soltanto le features in maniera lineare. La risposte è che diventa più semplice nella pratica, poiché nel momento in cui vado a considerare delle features che non lo sono, tutto risulterà più complesso a livello di costo computazionale.
+    Utilizzare le features in maniera lineare, risulta essere più semplice a livello di costo computazionale.
 \end{Osservazione}
 
 \section{Reti Neurali Poco Profonde}
-Per poter far fronte a quesat problemati, si possono utilizzare le strategie quì di seguito elencate:
+Per poter far fronte a questa problematica, si possono utilizzare le strategie quì di seguito elencate:
 
 \begin{itemize}
     \item Le macchine a vettori di supporto (SVM) e i metodi a kernel utilizzano uno strato con funzioni di base non lineari, seguito da uno strato lineare;
@@ -97,21 +96,21 @@ Per poter far fronte a quesat problemati, si possono utilizzare le strategie qu�
 \end{itemize}
 
 \begin{Teorema}
-    Una rete con 2 strati (con 1 strato nascosto), è un approssimatore universale, può cioè approssimare in modo arbitrariamente preciso ogni funzione continua $g(u_1,u_2,\dots,u_d)$ (pur di prendere un numero sufficiente di neuroni).
+    Una rete con 2 strati (con 1 strato nascosto), è un approssimatore universale, può approssimare in modo arbitrariamente preciso ogni funzione continua $g(u_1,u_2,\dots,u_d)$.
     \label{th:Cybenko_1989}
 \end{Teorema}
 
-A fronte di questo teorema potremmo chiederci del perché con il Deep Learning, ci dobbiamo spingere a utilizzare delle reti neurali più profonde, visto che ogni funzione continua sia possibile rappresentarla anche con semplicemente un singolo layer nascosto.
+A fronte di questo teorema potremmo chiederci del perché con il Deep Learning, utilizziamo delle reti neurali più profonde, visto che ogni funzione continua è rappresentabile con un singolo layer nascosto.
 
 \subsubsection{Perché le Architetture Profonde?}
-La risposta viene trovata facilmente, poiché una rete neurale profonda è in grado di rappresentare funzioni complesse in modo più efficiente rispetto a una rete poco profonda, ma soprattuto, nel momento in cui passiamo a una rete neurale più profonda avremo un risultato in meno tempo, quindi abbiamo rinunciato a dello spazio per risparmiare del tempo. Inoltre esse hanno:
+Una rete neurale profonda è in grado di rappresentare funzioni complesse in modo più efficiente rispetto a una rete non profonda. Nel momento in cui passiamo a una rete neurale profonda otterremo un risultato in meno tempo, dunque si rinuncia a dello spazio per risparmiare del tempo. Inoltre esse hanno:
 \begin{itemize}
     \item Maggiore capacità di modellare strutture gerarchiche nei dati  (es. riconoscimento visivo, riconosco una figura a seconda di sue diverse caratteristiche, ognuna analizzata in un layer);
     \item Possibilità di apprendere trasformazioni sempre più astratte dei nostri dati.
 \end{itemize}
 
 \section{Ipotesi del Manifold}
-Un concetto molto importante del Deep Learning è l'ipotesi del \textbf{Manifold}, se volessimo riconoscere la faccia di una persona prendendo in analisi quella nella Figura~\ref{fig:manifold}, noi possiamo notare che in ognuna delle sottofigure vi è la stessa persona, è corretto interrogarsi sul perché noi umani, riusciamo a dire ciò. Molto semplicemente ci sono delle caratteristiche che noi riusciamo a riconoscere che appartengono alla stessa persona. Il nostro cervello, e più in generale, la nostra realtà si trova in uno spazio dimensionale che non è della stessa grandezza della figura che possiamo creare.
+Un concetto molto importante del Deep Learning è l'ipotesi del \textbf{Manifold}. Il nostro obbiettivo vuole essere quello di riconoscere la faccia della persona presente nella Figura~\ref{fig:manifold}, notiamo come in ognuna delle sottofigure vi è la stessa persona, noi riusciamo a caprilo facilmente, ma come questo accade ci permette di comprendere come potrebbero farlo le macchine. Ci sono delle caratteristiche che siamo in grado di riconoscere le quali appartengono alla stessa persona. Il nostro cervello, e più in generale, la nostra realtà si trova in uno spazio dimensionale che non è della stessa grandezza di una figura che possiamo creare.
 
 \begin{figure}[h]
     \centering
@@ -120,27 +119,27 @@ Un concetto molto importante del Deep Learning è l'ipotesi del \textbf{Manifold
     \label{fig:manifold}
 \end{figure}
 
-\marginpar{L'argomento della Data Manifold, viene trattato di più in: \href{https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1640964}{Hadsell et al. CVPR 2006~\cite{hadsell2006dimensionality}}}
+\marginpar{L'argomento della Data Manifold, viene trattato meglio in: \href{https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1640964}{Hadsell et al. CVPR 2006~\cite{hadsell2006dimensionality}}}
 
-È stato dimostrato come noi umani, siamo in grado di riconoscere una faccia di una persona rappresentando meno di 56 variabili, mentre differentemente nel momento in cui usiamo un'immagine composta da $1000$x$1000$ pixel avrò $1\,000\,000$ di dimensioni per il nostro calcolatore. Questa è la così detta ipotesi del Manifold, ossia che la realtà vive in una dimensione molto minore rispetto alla dimensione che utiliziamo per rappresentarla. 
+È stato dimostrato come noi umani, siamo in grado di riconoscere una faccia di una persona rappresentando meno di 56 variabili, mentre un calcolatore usando un'immagine $1000$x$1000$ pixel avrò bisogno di $1\,000\,000$ di variabili. Questa è la così detta ipotesi del Manifold: la realtà vive in una dimensione notevolmente minore rispetto alla dimensione che utiliziamo per rappresentarla, differentemente da ciò che avviene per le macchine. 
 
 \subsubsection{Correlazione con cio che stiamo facendo}
-Se avessimo un estrattore ideale, potremmo essere in grado di prendere questa immagine da un milione di dimensioni, e semplicemente estrarre queste 56 features, in modo tale da essere in grado di riconoscere l'immagine. Pertanto noteremo come muovendoci su un piano cartesiano, spostandoci lungo una singola dimensione cambieremo solo ed esclusivamente una singola features (Figura~\ref{fig:cartesianFig}).
+Se avessimo un estrattore ideale, potremmo essere in grado di prendere questa immagine da un milione di dimensioni, ed estrarre le 56 features, in modo tale da essere in grado di riconoscere l'immagine. Rappresentando i cambiamenti su un piano cartesiano, spostandoci lungo una singola dimensione cambieremo solo ed esclusivamente una singola features (Figura~\ref{fig:cartesianFig}).
 
 \begin{figure}
     \centering
     \includegraphics[width=0.45\linewidth]{figure/cartesianFig.png}
-    \caption{Rappresentazione di una possibile idealizzazione su un piano cartesiano di un estrattore di features}
+    \caption{Rappresentazione di un estrattore ideale di features su un piano cartesiano.}
     \label{fig:cartesianFig}
 \end{figure}
 \section{Struttura Gerarchica dei Dati}
-Le architetture multilivello riflettono la natura composizionale dei dati, analizzando le parti di esse di volta in volta, queste possono diventare delle ottime possibilità per spostarci verso un estrattore ideale, permettendo un'efficiente rappresentazione delle informazioni:
+Le architetture multilivello riflettono la natura composizionale dei dati, analizzando parti dei dati ogni volte, queste possono diventare delle ottime possibilità per spostarci verso un estrattore ideale, permettendo un'efficiente rappresentazione delle informazioni:
 
 \begin{itemize}
-    \item \textbf{Visione}: pixel $\Rightarrow$ bordi $\Rightarrow$ texture $\Rightarrow$ oggetti
-    \item \textbf{Testo}: caratteri $\Rightarrow$ parole $\Rightarrow$ frasi $\Rightarrow$ discorso
-    \item \textbf{Audio}: campioni $\Rightarrow$ bande spettrali $\Rightarrow$ fonemi $\Rightarrow$ parole
+    \item \textbf{Visione:} pixel $\Rightarrow$ bordi $\Rightarrow$ texture $\Rightarrow$ oggetti;
+    \item \textbf{Testo:} caratteri $\Rightarrow$ parole $\Rightarrow$ frasi $\Rightarrow$ discorso;
+    \item \textbf{Audio:} campioni $\Rightarrow$ bande spettrali $\Rightarrow$ fonemi $\Rightarrow$ parole.
 \end{itemize}
 
 \section{Conclusione}
-Le reti neurali profonde pertanto non fanno altro che bilanciare tempo e spazio, facendo sì che più livelli implicano più operazioni sequenziali, riducono la necessità di risorse computazionali parallele e infine consentono una rappresentazione più compatta delle funzioni complesse.
+Le reti neurali profonde permettono di bilanciare tempo e spazio, garantendo che i più livelli implichino più operazioni sequenziali, riducono la necessità di risorse computazionali parallele e consentono una rappresentazione più compatta delle funzioni complesse.

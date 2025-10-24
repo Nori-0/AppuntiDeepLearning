@@ -1,51 +1,61 @@
 \chapter{Architetture di Base}
+
+Quando si parla di Deep Learning, si usano spesso delle strutture grafiche, aggiungendo dei livelli di astrazione, per poter semplificare la comprensione delle architetture complesse, queste strutture prendono il nome di \textbf{Grafi Computazionali}. La rappresentazione grafica di alcuni dei modelli più complessi, permette di comprendere al meglio come vengono implementate alcune nuove tecniche. Adesso vedremo, semplici implementazioni, per dare un'idea di utilizzo, e lasciare a chi legge, la possibilità di adottarle nei propri progetti.
+
 \section{Moduli moltiplicativi}
-Iniziamo in primis da delle architetture molto semplici che useremo molte volte all'interno del corso, esse sono i moduli moltiplicativi. Possiamo notare come si può effettuare il processo di backpropagation rispetto agli input, ma anche rispetto a dei pesi. Pertanto ci chiediamo qual è la differenza fra gli input e i pesi, la prima che ci viene in mente senz'altro è quella che i primi non sono direttamente imparabili, gli altri invece no. Ma cosa succederebbe nel caso in cui i pesi fossero gli output di un'altra Neural Network ? Questa possibilità risulta essere possibile e viene effettuata molto spesso in Deep Learning.
+Iniziamo da delle architetture semplici: i moduli moltiplicativi. Creiamo immediatamente un collegamento con questi moduli, sfruttando un esempio pratico. Nel processo di backpropagation essi vengono utilizzati, poiché si può effettuare tale processo, rispetto agli input, o rispetto ai pesi. La differenza fra operare rispetto agli uno o gli altri si trova nell'impossibilità di imparare direttamente i pesi, come avviene per gli input. In molti hanno pensato cosa succederebbe nel caso in cui i pesi fossero gli output di un'altra Rete Neurale, questa possibilità viene sfruttata tramite i moduli moltiplicativi.
 
 \begin{equation}
     s_i = \sum_{j}w_{ij}x_{j}\,:\, w_{ij}=\sum_ku_{ijk}z_k \Rightarrow s_i=\sum_{jk}u_{ijk}z_kx_j
     \label{eq:weightAsInput}
 \end{equation}
 
-\begin{figure}
+Come vediamo nella formula di cui sopra, possiamo notare come, essa sia una sostituzione semplice, ottenendo comunque un risultato desiderato, senza modificare il senso dell'operazione. Questa semplice sostituzione, è stata adottata in molti contesti di Deep Learning.
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.3\linewidth]{figure/WeightAsInput.png}
+    \includegraphics[width=0.4\linewidth]{figure/WeightAsInput.png}
     \caption{Grafo computazionale corrispettivo all'equazione~\ref{eq:weightAsInput}}
     \label{fig:wai}
 \end{figure}
 
-Viene pertanto automatico chiedersi, nel caso in cui avessimo una Neural Network che controlla i pesi, siamo in grado di ricrearne una nuova, modificandone soltanto i pesi, o combinando gli output. Questa cosa risulta essere possibile, e una singola Neural Network è in grado di controllarne altre due, potremmo tuttavia avere dei limiti i quali dobbiamo imporre nella nostra equazione. Inanzitutto, dobbiamo evitare che i numeri delle reti neurali possano portare a generare un'esplosione di alcune delle nuove reti. Quello che vogliamo pertanto, è che la somma dei differenti pesi sia controllata dalla nostra prima rete neurale, facendi si, che sia in grado di decidere quali reti neurali vogliamo che si attivino e quali no, si può vedere matematicamente dall'equazione~\ref{eq:attentionMod}. È un meccanismo facilmente implementabile utilizzando un modulo chiamato \textit{SoftMax}, sul quale ci soffermeremo più avanti, esso ci permette di calcolare nuovi pesi oltre all'attivazione. Questa tipologia di architettura, in cui abbiamo una rete la quale controlla altre reti, prende il nome di \textbf{Modulo dell'attenzione}, chiamato così perché, in base agli input decide di dare più o meno importanza alle singole reti neurali.
+Se avessimo una Rete Neurale che si occupa del controllo dei pesi, saremmo in grado di crearne una nuova con una semplice variazione di essi, potendo persino ampliarne la portata riuscendo a controllarne molte reti con una a supervisionare. Questo non è un lavoro semplice, dovremmo effettuare delle limitazioni per non incorrere in problematiche di esplosione della rete stessa. Dunque la rete neurale al di sopra delle altre, funziona come un "controllore", pesando di più una sottorete piuttosto che un'altra (Figura~\ref{eq:attentionMod}). Questo meccanismo si implementa adoperando la funzione \textbf{SoftMax}, che tratteremo più avanti, essa ci permette di calcolare nuovi pesi ed effettuare un'attivazione. Questa architettura prende il nome di \textbf{Modulo dell'attenzione}, dando più o meno importanza in base all'input ricevuto alle singole reti neurali.
 
 \begin{equation}
     s_i = \sum_jw_jx_{ij} \,:\,w_j=\frac{e^{z_{j}}}{\sum_ke^{z_k}}
     \label{eq:attentionMod}
 \end{equation}
 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.35\linewidth]{figure/AttentionModule.png}
-    \caption{Grafo computazionale del controllo effettuato su nuove rete neurali generate da una prima}
+    \includegraphics[width=0.4\linewidth]{figure/AttentionModule.png}
+    \caption{Grafo computazionale rappresentante il Modulo dell'attenzione, in cui ci sono più reti, controllate da una singola, la quale da più o meno importanza alle sottoreti in base all'input ricevuto.}
     \label{fig:AttentionMod}
 \end{figure}
 
-Possiamo immaginare questi moduli moltiplicativi in una maniera dettagliata, vogliano utilizzare una risorsa esterna per attivare e disattivare un input che potrebbe essere inserito in un'altra rete neurale, come se stessimo parlando di uno switch. La modalità più efficace per far ciò, è usare come moltiplicatori 0 e 1, facendo si che se immettessi 1 e 0 attiverò una parte del mio modulo, mentre se immettessi 0 e 1 attiverò l'altra. Tuttavia giunti a questo punto vi è un problema, ossia 1 e 0 sono dei numeri, e non possiamo differenziare rispetto a dei numeri, ma se sostituissimo questi valori con gli output di un'altra rete neurale, la backpropagation potrebbe essere effettuata.
-
 \subsubsection{Mixture of Experts}
-Fondamentalmente l'idea che stiamo analizzando inserendo più reti neurali in un'unica architettura, prende il nome di \textbf{Mixture of Experts}, infatti partendo da una semplice rete neurale con $x_1$ e $x_2$ come ingressi, l'abbiamo estesa sempre più rendendola ma estendendola diventando un'\textit{esperta}, creando una rete neurale molto grande con all'interno milioni e milioni di parametri, come per esempio possiamo immaginarci un modello di linguaggio. Il modello Mixture of Experts, è una rete neurale, la quale ci permette di selezionare su quale modello specifico fare affidamento per compiere un determinato task (Figura~\ref{fig:mixExp}). Alcuni dei più utilizzati modelli di linguaggio infatti prendono in considerazione una combinazione di esperti specializzati in attività specifiche (es. Traduzione, riassunto, calcoli, ecc\dots). 
+L'idea che stiamo analizzando, inserendo più reti neurali in un'unica architettura, prende il nome di \textbf{Mixture of Experts}, partendo da una semplice rete neurale con $x_1$ e $x_2$ come ingressi, la estendiamo rendendola un'\textit{esperta}, creando una rete con all'interno milioni di parametri. Il modello Mixture of Experts è una rete neurale, la quale controlla diversi task, spezzati nelle singole sottoreti, selezionando su quale fare affidamento a seconda della necessità (Figura~\ref{fig:mixExp}). I modelli di linguaggio, utilizzano questa strategia, prendono in considerazione una combinazione di reti specializzate in diverse attività (es. Traduzione, riassunto, calcoli, ecc\dots). 
 
-\begin{figure}
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.50\linewidth]{figure/MixtureOfExpert.png}
-    \caption{Grafo computazionale, rappresentativo di un modello di Mixture of Experts, un mix di modelli esperti in compiti specifici attivati o disattivati da un'altra rete neurale tramite l'utilizzo della funzione softmax.}
+    \includegraphics[width=0.5\linewidth]{figure/MixtureOfExpert.png}
+    \caption{Grafo computazionale, del modello Mixture of Experts, vari modelli specializzati in compiti specifici, attivati o disattivati da un'altra rete neurale tramite l'utilizzo della funzione softmax.}
     \label{fig:mixExp}
 \end{figure}
 
 \subsubsection{Parameter Transoformation}
-Possiamo vedere l'operazione generata da un'architettura di Mixture of Experts, in un'altra maniera, ci basti immaginare un parametro W, il quale viene utilizzato in una rete per venire trasformato, chiamiamo infatti questa operazione: \textbf{Parameter Trasformation}. Questa procedura risulta essere molto importante, poiché possiamo avere diverse modalità di trasformazioni sui parametri, una di queste è la \textbf{Condivisione dei pesi}. La condivisione dei pesi è una tecnica in cui lo stesso insieme di parametri viene utilizzato più volte in diverse parti del modello, riducendo il numero totale di parametri e migliorandone l'efficienza complessiva. Si può considerare come un blocco il quale a un singolo input assegna più output, dove questi output sono pesi diversi, venendo poi inseriti nella nostra rete neurale principale. Questa tecnica la possiamo utilizzare in diverse parti del nostro input, ottenendo poi diverse funzioni di costo che possono essere combinate. Dunque, modificheremo questa rete, attraverso la backpropagation la quale ci permetterà di ottenere nuovi pesi che funzioneranno per tutti i possibili input, creando un modello capace di generallizare meglio di prima (Figura~\ref{fig:wshar}).
 
-\begin{figure}
+Un modo generale per concettualizzare architetture come la Mixture of Experts è attraverso l'idea di \textbf{Parameter Transformation}. Invece di considerare i parametri di un modello, come i pesi $W$, dei valori statici appresi una sola volta, li concepiamo come l'output dinamico di un altro modulo. In pratica, la rete impara a generare o selezionare i parametri più adatti in base al contesto fornito dall'input. L'architettura Mixture of Experts (MoE) può essere vista come un caso specifico di questo principio. In una MoE, la rete generale non crea nuovi pesi, ma seleziona quale set di parametri (quello di un "esperto") utilizzare. Differentemente la Parameter Transformation è un'operazione di selezione dinamica. Una delle applicazioni più diffuse di questo concetto è la \textit{Weight Sharing}. Questa tecnica consiste nell'utilizzare lo stesso modulo parametrico, definito da un set di pesi $w$, applicandolo ripetutamente in diverse parti di un modello o per elaborare porzioni differenti dell'input (Figura~\ref{fig:wshar}).
+
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.50\linewidth]{figure/WeightShar.png}
-    \caption{Grafo computazionale che sintetizza la condivisione dei pesi, utilizzandoli come input differenti generando nuove funzioni di costo, permettendo di generalizzare il modello su diversi input.}
+    \includegraphics[width=0.65\linewidth]{figure/WeightShar.png}
+    \caption{Esempio di grafo computazionale che implementa la Weight Sharing. Un unico set di parametri, il kernel $w$, riutilizzato ripetutamente dalla funzione $G$ su diverse sezioni dell'input.}
     \label{fig:wshar}
 \end{figure}
+
+Quindi si ha un modulo generatore di pesi, iniettato in diversi punti della rete principale permettendo di avere due vantaggi principali:
+
+\begin{itemize}
+    \item \textbf{Efficienza:} Invece di dover apprendere e memorizzare un set di pesi indipendente per ogni operazione, si apprende un unico e più compatto modulo che sa come generarli. Riduce drasticamente il numero totale di parametri del modello, rendendolo più leggero ed efficiente;
+    \item \textbf{Generalizzazione:} Durante l'addestramento, il processo di backpropagation diventa particolarmente efficace. Se lo stesso modulo di pesi condivisi viene utilizzato in $N$ contesti diversi, esso riceverà i gradienti di errore da tutte e $N$ le funzioni di costo parziali. Questo "costringe" il modulo ad apprendere parametri che non siano specifici per un singolo compito, ma che siano abbastanza robusti da funzionare bene in tutte le situazioni. Porta a un risultato con una migliore capacità di generalizzazione.
+\end{itemize}

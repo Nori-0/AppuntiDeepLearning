@@ -37,7 +37,7 @@
 % ========================================
 \usepackage{graphicx}       % Inserimento di immagini
 \usepackage{tikz}           % Disegni vettoriali complessi
-\usetikzlibrary{patterns, positioning} % Librerie aggiuntive per TikZ (pattern e posizionamento)
+\usetikzlibrary{patterns, positioning, calc, arrows.meta} % Librerie aggiuntive per TikZ (pattern e posizionamento)
 \usepackage{pgfplots}       % Creazione di grafici
 \usepackage{pgfplotstable}  % Importazione e visualizzazione di tabelle nei grafici
 \usepackage{subcaption}     % Sottodidascalie per immagini affiancate
@@ -131,7 +131,7 @@
     frame=tb,                         
     showstringspaces=false,
     %literate={_}{{\textunderscore}}1  % Gestisce l'underscore
-             {$}{{\ensuremath{\$}}}1  % Permette l'uso di $
+             %{$}{{\ensuremath{\$}}}1  % Permette l'uso di $
 }}
 
 % Ambiente Python

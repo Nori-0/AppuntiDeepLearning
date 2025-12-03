@@ -1,5 +1,5 @@
 # AppuntiDeepLearning
-"Appunti completi di Deep Learning (in italiano), basati sul corso universitario del Politecnico di Bari tenuto dal Prof. Vito Walter Anelli. Scritti in LaTeX per uso personale e accademico."
+Appunti completi di Deep Learning (in italiano), basati sul corso universitario del Politecnico di Bari tenuto dal Prof. Vito Walter Anelli. Scritti in LaTeX per uso personale e accademico.
 # Appunti di Deep Learning
 
 Benvenuti! Questa repository contiene i miei appunti personali sul Deep Learning, realizzati in LaTeX e organizzati per capitoli.

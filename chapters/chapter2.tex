@@ -1,19 +1,19 @@
 \chapter{Introduzione al Deep Learning}
 
-Ciò che bisogna consolidare prima di immergerci nello studio del Deep Learning è la differenza fra Machine Learning e Deep Learning. Per far questo bisogna analizzare quello che si fa con i programmi di Machine Learning, riferiamoci a uno specifico caso d'uso. Partiamo considerando il riconoscimento di un'immagine. Nel Machine Learning si parte dal creare un programma, il quale deve essere in grado, data un'immagine, di estrarre alcuni attributi per poi utilizzarli all'interno di un modello di ML e riconoscere immagini della stessa tipologia. Il passo ulteriore che viene effettuato nel Deep Learning è a monte, ossia durante la selezione degli attributi, quì noi costruiamo una gerarchia degli stessi, avendo la possibilità di stabilire attributi di basso, medio e alto livello. Questa selezione avviene con la combinazione di modelli di Machine Learning, creando nella sua complessità un meccanismo automatico più raffinato e profondo, da cui nasce il Deep Learning.
+Ciò che bisogna consolidare prima di immergerci nello studio del Deep Learning è la differenza fra Machine Learning e Deep Learning. Per far questo bisogna analizzare quello che si fa con i programmi di Machine Learning, qui ci riferiremo a dei casi d'uso speicfici, partendo dal riconoscimento delle immagini. Nel Machine Learning si parte dal creare un programma, il quale deve essere in grado, data un'immagine, di estrarre alcuni attributi per poi utilizzarli, all'interno di un modello di ML e riconoscere immagini della stessa tipologia. Il passo ulteriore che viene effettuato nel Deep Learning è a monte, ossia durante l'estrazione degli attributi, dove costruiamo una gerarchia degli stessi, avendo la possibilità di stabilire attributi di basso, medio e alto livello. Questa selezione avviene con la combinazione di modelli di Machine Learning stratificati, creando nella sua complessità un meccanismo automatico più raffinato e profondo, da cui nasce il Deep Learning.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.75\linewidth]{figure/DeepMachineDiff.png}
-    \caption{Schema rappresentativo della principale differenza fra un modello di Machine Learning e di Deep Learning}
+    \caption{Schema rappresentativo della principale differenza fra un modello di Machine Learning e un modello di Deep Learning}
     \label{fig:DLMLDiff}
 \end{figure}
 
 \section{Definizione}
-Il Deep Learning dunque è una sotto-disciplina del Machine Learning la quale utilizza reti neurali profonde, ossia delle reti neurali con numerosi hidden-layer, per poter estrarre delle rappresentazioni gerarchiche dai dati. A differenza dei metodi tradizionali di Machine Learning, i quali richiedono l'ingegnerizzazione manuale delle caratteristiche, il Deep Learning è in grado di apprendere automaticamente rappresentazioni multi-livello, direttamente dai dati grezzi. Questo approccio, si è dimostrato particolarmente efficace in campi come la visione artificiale, il riconoscimento vocale e l'elaborazione del linguaggio naturale.
+Il \textbf{Deep Learning} dunque è una sotto-disciplina del Machine Learning la quale utilizza \textit{Reti Neurali Profonde}, ossia delle reti neurali con numerosi hidden-layer, per poter estrarre delle rappresentazioni gerarchiche dai dati. A differenza dei metodi tradizionali di Machine Learning, i quali richiedono l'ingegnerizzazione manuale delle caratteristiche, il Deep Learning è in grado di apprendere automaticamente rappresentazioni multi-livello, direttamente dai dati grezzi. Questo approccio, si è dimostrato particolarmente efficace in campi come la visione artificiale, il riconoscimento vocale e l'elaborazione del linguaggio naturale.
 
 \section{Esempio: Il dataset MNIST}
-MNIST è un dataset ampiamente utilizzato per il riconoscimento di cifre scritte a mano. Composto da 60.000 immagini di addestramento e 10.000 immagini di test, ognuna delle quali è una griglia $28\times28$ di pixel in scala di grigi. L'obiettivo di un modello di apprendimento automatico addestrato su MNIST, risulta essere quello di classificare correttamente ogni immagine in una delle 10 categorie (da 0 a 9). Questo dataset viene spesso utilizzato come benchmark, per poter valutare le prestazioni di nuovi algoritmi di apprendimento profondo.
+MNIST è un dataset ampiamente utilizzato per il riconoscimento di cifre scritte a mano. Composto da 60.000 immagini di addestramento e 10.000 immagini di test, ognuna delle quali è una griglia $28\times28$ di pixel in scala di grigi. L'obiettivo di un modello di apprendimento automatico addestrato su MNIST, risulta essere quello di classificare correttamente ogni immagine in una delle 10 categorie (da 0 a 9). Questo dataset viene spesso utilizzato come Benchmark, per poter valutare le prestazioni di nuovi algoritmi di Deep Learning.
 \\
 \begin{figure}[ht]
     \centering
@@ -22,7 +22,7 @@ MNIST è un dataset ampiamente utilizzato per il riconoscimento di cifre scritte
 \end{figure}
 
 \section{Grafi Computazionali}
-Un Grafo computazionale rappresenta il flusso di operazioni effettuate tra variabili, viene utilizzato per modellare i calcoli svolti da una rete neurale. Ogni nodo del grafo rappresenta un'operazione matematica, mentre i bordi o archi, rappresentano i flussi di dati. Utilizzando questa struttura, possiamo visualizzare il flusso delle informazioni e il processo di apprendimento della rete. Ad esempio, in una rete neurale profonda, ogni livello applica una trasformazione, tramite l'utilizzo di una funzione di attivazione generando un output, il quale verrà poi propagato fino al livello finale, per ottenerne una previsione. Il modello utilizzato da noi, distingue nettamente i vari elementi tramite l'utilizzo di forme e colori, in modo da essere maggiormente intuitivo, avendo una differenza fra input, funzioni deterministiche e funzioni scalari (Figura~\ref{fig:parModel}).
+Un \textbf{Grafo computazionale} rappresenta il flusso di operazioni effettuate tra variabili, esso viene utilizzato per modellare i calcoli svolti da una Rete Neurale. Ogni nodo del grafo rappresenta un'operazione matematica, mentre i bordi o archi, rappresentano i flussi di dati. Utilizzando questa struttura, possiamo visualizzare il flusso delle informazioni e il processo di apprendimento della rete, semplificando visivamente i nostri modelli. Ad esempio, in una rete neurale profonda, ogni livello applica una trasformazione, tramite l'utilizzo di una funzione di attivazione generando un output, il quale verrà poi propagato fino al livello finale, per ottenerne una previsione. Il modello utilizzato da noi, distingue nettamente i vari elementi tramite l'utilizzo di forme e colori, avendo una differenza fra input, funzioni deterministiche e funzioni scalari (Figura~\ref{fig:parModel}).
 
 \begin{figure}
     \centering
@@ -32,10 +32,10 @@ Un Grafo computazionale rappresenta il flusso di operazioni effettuate tra varia
 \end{figure}
 
 \section{Funzione di costo}
-Una \textbf{Funzione di Costo} è un'operazione riportabile tramite l'utilizzo dei nostri grafi computazionali (Figura~\ref{fig:costFunction}). Questa funzione misura l'errore pesente tra l'output fornito dal modello, dunque una predizione e l'output desiderato, essa, risulta essere fondamentale per il processo di apprendimento. Il modello, cerca di minimizzare questa funzione di costo, in inglese Loss Function (per questo si parla spesso di perdita), aggiustando i pesi della rete di volta in volta attraverso un algoritmo di ottimizzazione. Una delle funzioni di costo più comuni è la Mean Squared Error (MSE), definita come:
-\begin{equation}
-    C(y, \hat{y}) = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
-\end{equation}
+Una \textbf{Funzione di Costo} (Loss Function) è un'operazione riportabile tramite l'utilizzo dei nostri grafi computazionali (Figura~\ref{fig:costFunction}). Questa funzione misura l'errore pesente tra l'output fornito dal modello (predizione) e l'output desiderato (valore atteso), essa, è fondamentale per il processo di apprendimento. Il modello, cerca di minimizzare questa funzione di costo, aggiustando i pesi della rete di volta in volta attraverso un algoritmo di ottimizzazione. Una delle funzioni di costo più comuni è la Mean Squared Error (MSE), definita come:
+\[
+    \mathcal{L}(y, \hat{y}) = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+\]
 Dove $y_i$ rappresenta il valore reale e $\hat{y}_i$ l'output predetto dal modello per il campione $i$-esimo. Minore è il valore della funzione di costo, migliore sarà la capacità del modello di effettuare previsioni accurate.
 
 \begin{figure}
@@ -46,16 +46,16 @@ Dove $y_i$ rappresenta il valore reale e $\hat{y}_i$ l'output predetto dal model
 \end{figure}
 
 \section{Reti Neurali}
-Una Rete Neurale, tramite i nostri grafi computazionali, risulta essere una pila di blocchi funzionali lineari e non lineari. Le loro entità fondamentali prendono il nome di neuroni(Figura~\ref{fig:neuralNet}). Ogni \textbf{neurone} calcola una somma pesata degli input ricevuti e applica una funzione di attivazione per introdurre non linearità nel modello. Questa architettura, permette alla rete di apprendere rappresentazioni complesse dei dati. Un singolo neurone in una rete neurale può essere rappresentato come segue:
-\begin{equation}
+Una Rete Neurale, tramite i nostri grafi computazionali, risulta essere una pila di blocchi funzionali lineari e non lineari. Le loro entità fondamentali prendono il nome di \textbf{Neuroni} (Figura~\ref{fig:neuralNet}). Ogni \textit{Neurone} calcola una somma pesata degli input ricevuti e applica una funzione di attivazione per introdurre non linearità all'interno del modello. Questa architettura, permette alla rete di apprendere rappresentazioni complesse dei dati. Un singolo neurone in una rete neurale può essere rappresentato come segue:
+\[
     z = \sum_{i=1}^{n} w_i x_i + b
-\end{equation}
-Dove $w_i$ sono i pesi associati agli input $x_i$, e relativi al bias $b$ (un peso costante che va sommato agli altri pesi). Successivamente, viene applicata una funzione di attivazione $\sigma(z)$ in modo tale da ottenere un output finale:
-\begin{equation}
-    y = \sigma(z)
-\end{equation}
+\]
+Dove $w_i$ sono i pesi associati agli input $x_i$, e vengono sommati al bias $b$ (un valore costante). Successivamente, viene applicata una funzione di attivazione $\sigma(z)$ per poter aggiungere non linearità, come detto in precedenza e poter ottenere l'output finale:
+\[
+    \hat{y} = \sigma(z)
+\]
 
-Le reti neurali, sono strutture complesse composte da tanti neuroni, i quali possono essere completamente collegati fra loro, generando le \textit{Fully-Connected Neural Network}, oppure collegate parzialemente creandone di diversa tipologia, i neuroni vengono concatenati formando diversi strati, dando la possibilità di formare delle archittetture profonde, composte da diversi strati.
+Le reti neurali, sono strutture complesse composte da tanti neuroni, i quali possono essere completamente collegati fra loro, generando le \textit{Fully-Connected Neural Network}, oppure parzialemente, i neuroni vengono concatenati fra loro, formando diversi strati, dando la possibilità di formare delle archittetture profonde.
 
 \begin{figure}[ht]
     \centering
@@ -65,11 +65,11 @@ Le reti neurali, sono strutture complesse composte da tanti neuroni, i quali pos
 \end{figure}
 
 \section{Backpropagation}
-La \textbf{Backpropagation} (retropropagazione), è uno degli algoritmi principali quando si parla di reti neurali, poiché permette di allenare la rete, basandosi sulla \textbf{discesa del gradiente}.
+La \textbf{Backpropagation} (retropropagazione), è uno degli algoritmi principali quando si parla di \textit{Reti Neurali}, poiché permette di allenare la rete, basandosi sulla \textbf{Discesa del Gradiente}.
 \begin{Definizione}
-    La discesa del gradiente è un algoritmo di ottimizzazione che trova il valore minimo di una funzione, spostandosi iterativamente nella direzione opposta al suo gradiente. 
+    La Discesa del Gradiente è un algoritmo di ottimizzazione che trova il valore minimo di una funzione, spostandosi iterativamente nella direzione opposta al suo gradiente. 
 \end{Definizione}
-L'idea della Backpropagation, è quella di propagare all'indietro l'errore generato dalla predizione e dal valore effettivo, in modo da aggiornare i pesi della rete, in modo che venga ridotto l'errore complessivo (la loss function). Il processo di Backpropagation consente di calcolare i gradienti dell'errore, rispetto ai pesi della rete e poter propagare questi gradienti attraverso la rete all'indietro, in modo tale da aggiornare i pesi e ottenere dei risultati sempre più accurati di volta in volta fintantoché non si raggiunge a una convergenza dei valori dei pesi.
+L'idea della Backpropagation, è quella di propagare all'indietro l'errore generato dalla predizione e dal valore atteso, per aggiornare i pesi della rete e ridurre l'errore complessivo (la Loss Function), ottenendo dei risultati sempre più accurati di volta in volta fintantoché non si raggiunge una convergenza sui valori dei pesi.
 
 \subsection{Calcolo dei Gradienti}
 Il cuore della Backpropagation risiede nel calcolo dei gradienti della loss function rispetto ai pesi, utilizzando la \textbf{regola della catena}.
@@ -80,11 +80,11 @@ Il cuore della Backpropagation risiede nel calcolo dei gradienti della loss func
     \]
 \end{Definizione}
 \marginpar{\href{https://cannydatascience.medium.com/backpropagation-come-apprende-una-rete-neurale-91c0c900fbc}{Approfondimento sulla Backpropagation}}
-L'algoritmo di Backpropagation calcola i gradienti da ogni layer e li propaga all'indietro, aggiornando i pesi della rete. Il gradiente indica la direzione nella quale i pesi devono essere aggiornati per ridurre l'errore complessivo. La formula generale per la derivata della funzione di costo rispetto ai pesi è la seguente:
-\begin{equation}
-    \frac{\partial C}{\partial W} = \frac{\partial C}{\partial y} \cdot \frac{\partial y}{\partial W}
-\end{equation}
-Dove $C$ rappresenta la funzione di costo, $y$ l'output del modello e $W$ il peso da aggiornare. Questo processo viene ripetuto per ogni livello della rete, fino all'ottimizzazione del valore dei pesi. Questa procedura può essere facilmente sintetizzata in un grafo computazionale (Figura~\ref{fig:backPropGraph}). Nell'algoritmo della backpropagation è possibile applicare qualunque grafo che sia diretto e aciclico. Nel caso in cui il grafo presentasse dei loop, sarà necessario scioglierli.
+La formula generale per la derivata della funzione di costo rispetto ai pesi è la seguente:
+\[
+    \frac{\partial \mathcal{L}}{\partial W} = \frac{\partial \mathcal{L}}{\partial y} \cdot \frac{\partial y}{\partial W}
+\]
+Dove $\mathcal{L}$ è la funzione di costo, $y$ l'output del modello e $W$ il peso da aggiornare. Questo processo viene ripetuto per ogni livello della rete, fino all'ottimizzazione del valore dei pesi. Questa procedura può essere facilmente sintetizzata in un grafo computazionale (Figura~\ref{fig:backPropGraph}). Nella backpropagation è possibile applicare qualunque grafo che sia diretto e aciclico. Nel caso in cui il grafo presentasse dei loop, sarà necessario scioglierli.
 
 \begin{figure}
     \centering
@@ -94,7 +94,7 @@ Dove $C$ rappresenta la funzione di costo, $y$ l'output del modello e $W$ il pes
 \end{figure}
 
 \section{Problemi della Backpropagation}
-La Backpropagation soffre di due principali problemi ossia quello del \textit{gradiente che scompare} e quello che \textit{esplode}. Questi due problemi si verificano quando il gradiente della funzione di costo, rispetto ai pesi, risulta essere molto piccolo o molto grande nei livelli più profondi della rete.
+La Backpropagation soffre di due principali problemi legati al gradiente, ossia il \textit{gradiente che scompare} e la sua \textit{esplosione}. Questi due problemi si verificano quando il gradiente della funzione di costo, rispetto ai pesi, risulta essere molto piccolo o molto grande nei livelli più profondi della rete.
 
 \begin{itemize}
     \item \textbf{Gradiente che scompare:} nelle reti molto profonde, i gradienti calcolati per i livelli iniziali diventano sempre più piccoli man mano che vengono propagati all'indietro. Questo provoca degli aggiornamenti minimi dei pesi nei primi livelli, rallentando drasticamente l'addestramento o impedendo alla rete di apprendere;
@@ -104,15 +104,15 @@ La Backpropagation soffre di due principali problemi ossia quello del \textit{gr
 Con il passare degli anni il Machine Learning evolvendosi e specializzandosi nel Deep Learning, portando allo sviluppo di diverse soluzioni per queste problematiche:
 
 \begin{enumerate}
-    \item \textbf{Funzioni di attivazione avanzate:} L'utilizzo di altre funzioni come \textbf{ReLU} (Rectified Linear Unit) la quale ha ridotto il problema del gradiente che scompare rispetto alla funzione $\operatorname{sigmoid}$ e $\operatorname{tanh}$. Varianti come $\operatorname{Leaky\,ReLU}$ e $\operatorname{Parametric\,ReLU}$ migliorano ulteriormente l'apprendimento;
-    \item \textbf{Inizializzazione dei pesi:} Metodi di inizializzazione dei pesi come \textbf{Xavier} per l'assegnamento dei pesi stabilizzano i gradienti all'inizio dell'addestramento;
+    \item \textbf{Funzioni di attivazione avanzate:} L'utilizzo di altre funzioni come \textbf{ReLU} (Rectified Linear Unit) la quale ha ridotto il problema del gradiente che scompare rispetto alla funzione Sigmoide e tangente iperbolica. Varianti come $\operatorname{Leaky\,ReLU}$ e $\operatorname{Parametric\,ReLU}$ permettono di migliorare l'apprendimento;
+    \item \textbf{Inizializzazione dei pesi:} Metodi di inizializzazione dei pesi come \textbf{Xavier} per l'assegnamento dei pesi stabilizzano i gradienti all'inizio dell'addestramento, al posto di un'inizializzazione randomica o nulla;
     \item \textbf{Batch Normalization:} Tecnica la quale permette di normalizzare le attivazioni intermedie riducendo la varianza dei gradienti durante la propagazione.
 \end{enumerate}
 
 L'introduzione infatti di queste e altre tecniche, hanno permesso al Deep Learning di diventare un campo di studio sempre più interessante, divenendo anche più efficace come tecnica rispetto all'utilizzo di metodi tradizionali postulati dal Machine Learning.
 
 \section{Implementazione con PyTorch}
-Per effettuare una parallelizzazione della teoria, con l'aspetto implementativo del Deep Learning, quì mostriamo come implementare una rete neurale utilizzando \textbf{PyTorch}, per far ciò possiamo utilizzare la classe \texttt{nn.Module} in modo tale da definire la nostra architettura. Di seguito un esempio di una semplice rete con due livelli nascosti:
+Per effettuare una parallelizzazione della teoria, con l'aspetto implementativo del Deep Learning, quì mostriamo come implementare una rete neurale utilizzando \textbf{PyTorch} (una libreria open-source di Python), per far ciò utilizziamo la classe \texttt{nn.Module} così da definire la nostra architettura. Di seguito un esempio di una semplice rete con due livelli nascosti:
 \\
 \begin{python}[frame=trBL]
     import torch

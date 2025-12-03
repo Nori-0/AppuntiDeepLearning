@@ -1,5 +1,5 @@
-\chapter{Advanced Multi Head Attention}
-Questo capitolo esplora le tecniche avanzate di attenzione, quelle multi-head. Analizzando le ottimizzazioni che hanno reso possibile l'implementazione efficiente dei modelli di linguaggio di grandi dimensioni. Vengono trattate le tecniche di caching KV, le varianti Multi Query Attention (MQA) e Grouped Query Attention (GQA), gli embeddings posizionali rotatori (RoPE) e la Multi Head Latent Attention (MLA). Ogni tecnica viene presentata con le sue motivazioni teoriche, implementazioni pratiche e impatti sulle prestazioni.
+\chapter{Multi Head Attention}
+Questo capitolo esplora le tecniche avanzate di attenzione, in particolare quelle Multi-Head. Analizzando le ottimizzazioni che hanno reso possibile l'implementazione efficiente dei modelli di linguaggio di grandi dimensioni. Tratteremo le tecniche di Caching KV, le varianti Multi Query Attention (MQA) e Grouped Query Attention (GQA), gli Embeddings Posizionali Rotazionali (RoPE) e la Multi Head Latent Attention (MLA).
 
 
 \section{Introduzione}
@@ -8,7 +8,7 @@ L'architettura Transformer ha rivoluzionato il campo del Deep Learning nel campo
 
 \section{KV Cache}
 
-Durante la fase di inferenza nei modelli autoregressivi, il calcolo dell'attenzione per ogni nuovo token richiede l'accesso alle rappresentazioni di tutti i token precedenti. Senza ottimizzazioni, questo comporterebbe il ricalcolo completo delle matrici Key (K) e Value (V) per ogni posizione ad ogni step di generazione. La tecnica del \textbf{KV Cache} risolve questo problema memorizzando le matrici Key e Value calcolate nei passi precedenti:
+Durante la fase d'inferenza, nei modelli autoregressivi, il calcolo dell'attenzione per ogni nuovo token richiede l'accesso alle rappresentazioni di tutti i token precedenti. Senza ottimizzazioni, questo comporterebbe il ricalcolo completo delle matrici Key (K) e Value (V) per ogni posizione ad ogni step di generazione. La tecnica del \textbf{KV Cache} risolve questo problema memorizzando le matrici Key e Value calcolate nei passi precedenti all'interno della Cache:
 
 \begin{equation}
     \text{Attention}(Q_t, K_{1:t}, V_{1:t}) = \text{softmax}\left(\frac{Q_t K_{1:t}^T}{\sqrt{d_k}}\right) V_{1:t}
@@ -16,7 +16,7 @@ Durante la fase di inferenza nei modelli autoregressivi, il calcolo dell'attenzi
 
 dove $Q_t$ è la query per il token corrente alla posizione $t$, mentre $K_{1:t}$ e $V_{1:t}$ rappresentano tutte le chiavi e valori a partire dalla prima posizione, fino a giungere alla posizione $t$.
 
-\subsection{Implementazione del Cache}
+\subsection{Implementazione della Cache}
 Ad ogni step di generazione:
 \begin{enumerate}
     \item Si calcola la nuova coppia key-value per il token corrente;
@@ -121,21 +121,21 @@ dove $G$ è il numero di gruppi, fornendo una riduzione di memoria di un fattore
 GQA dimostra prestazioni superiori rispetto a MQA mantenendo significativi vantaggi in termini di memoria rispetto a MHA standard. Questa caratteristica l'ha resa una scelta popolare per molti modelli moderni di grandi dimensioni.
 
 \section{Limiti degli Embeddings}
-Gli embeddings posizionali assoluti presentano diverse limitazioni, di seguito elenchiamo due degli aspetti princiapali per cui si definiscono abbastanza limitati:
+Gli embeddings posizionali assoluti presentano diverse limitazioni, due degli aspetti princiapali per cui si definiscono abbastanza limitati sono i seguenti:
 
 \begin{itemize}
     \item \textbf{Lunghezza di Sequenza Limitata:} I modelli possono rappresentare posizioni solo fino a un limite predefinito durante l'addestramento, non potendo rappresentare posizioni oltre quel limite;
-    \item \textbf{Indipendenza delle Posizioni:} Ogni embedding posizionale è indipendente dagli altri, questo comporta che nella visione del modello, la differenza fra la posizione 1 e la posizione 2 è la stessa che vi è fra la posizione 2 e la posizione 500, impedendo al modello di comprendere le relazioni relative tra posizioni.
+    \item \textbf{Indipendenza delle Posizioni:} Ogni embedding posizionale è indipendente dagli altri, questo significa che per il modello, la differenza fra la posizione 1 e la posizione 2 è la stessa che vi è fra la posizione 2 e la posizione 500, impedendo al modello di comprendere le relazioni relative tra posizioni.
 \end{itemize}
 
-La mancanza di posizionamento relativo può ostacolare la capacità del modello di comprendere la struttura linguistica, dove le relazioni tra parole dipendono spesso dalla loro distanza relativa. Gli embeddings posizionali relativi, come quelli utilizzati nel modello T5, si concentrano sulle distanze tra coppie di token e non sulle posizioni assolute. Tuttavia, presentano sfide pratiche:
+La mancanza di posizionamento relativo può ostacolare la capacità del modello sul comprendere la struttura linguistica, dove le relazioni tra parole dipendono, spesso dalla loro distanza relativa. Gli embeddings posizionali relativi, come quelli utilizzati nel modello T5, si concentrano sulle distanze tra coppie di token e non sulle posizioni assolute. Tuttavia, presentano sfide pratiche:
 
 \begin{itemize}
     \item \textbf{Problemi di Prestazioni:} Possono essere più lenti, specialmente per sequenze lunghe;
-    \item \textbf{Complessità nel KV Cache:} Ogni token aggiuntivo altera l'embedding per tutti gli altri token, complicando l'uso efficiente del cache.
+    \item \textbf{Complessità nel KV Cache:} Ogni token aggiuntivo altera l'embedding per tutti gli altri token, complicando l'uso efficiente della cache.
 \end{itemize}
 
-Proprio a causa di queste complessità ingegneristiche, gli embedding posizionali non sono stati adottati largamente, specialmente nel contesto dei \textit{Large Language Models} (LLM), differentemente dall'utilizzo di quelli rotazionali che vedremo a breve, i quali si basano sulle \textit{matrici di rotazione}.
+Proprio a causa di queste complessità ingegneristiche, gli Embedding Posizionali non sono stati adottati largamente, soprattutto nel contesto dei \textit{Large Language Models} (LLM), differentemente dall'utilizzo di quelli rotazionali che vedremo a breve, i quali si basano sulle \textit{Matrici di Rotazione}.
 
 \subsection{Matrici di Rotazione}
 Le \textbf{Matrici di Rotazione} costituiscono la base matematica dei \textbf{RoPE} (Rotational Positional Embeddings). Una matrice di rotazione 2D è definita come:
@@ -147,23 +147,23 @@ Le \textbf{Matrici di Rotazione} costituiscono la base matematica dei \textbf{Ro
     \end{pmatrix}
 \end{equation}
 
-Quando questa matrice viene applicata a un vettore, tramite un prodotto, questa matrice cambia l'angolo del vettore mantenendo invariata la sua lunghezza.
+Quando questa matrice viene applicata a un vettore, tramite un prodotto, questa matrice cambia l'angolo del vettore mantenendone invariata la sua lunghezza.
 
 \subsection{Formulazione di RoPE}
-Proprio su questo si basano i Rotary Positional Embedding i quali differiscono dagli Embedding Posizionali Assoluti e Relativi, che rispettivamente uno assegna a ogni posizione un vettore che verrà sommato alla parola, non addattandosi a frasi lunghe, mentre l'altro si concentra sulla distanza fra parole, complicando però il calcolo dell'attenzione. \textbf{RoPE} propone un'idea molto elegante, ispirata alla geometria. Pensiamo a un orologio e immaginiamo che ogni parola sia rappresentata da una freccia (un vettore) che parte dal centro del quadrante, la prima parola verrà ruotata di dieci gradi, la terza di trenta gradi e così via. Questa è considerata un'idea geniale poiché quando il modello calcola l'attenzione tra due parole (usando il prodotto scalare), il risultato dipende solo dalla differenza angolare tra le due frecce. Quindi, applicando una rotazione basata sulla posizione assoluta, il modello impara automaticamente le relazioni di posizione relativa "gratis". RoPE per esempio applica rotazioni position-dependent alle rappresentazioni query e key, per due token alle posizioni $m$ e $n$:
+Proprio su questo principio si basano i Rotary Positional Embedding, differendo dagli Embedding Posizionali Assoluti e Relativi, ch assegnano uno a ogni posizione un vettore che verrà sommato alla parola, non addattandosi a frasi lunghe, l'altro sulla distanza fra parole, complicando però il calcolo dell'attenzione. \textbf{RoPE} propone un'idea molto elegante, ispirata alla geometria. Pensiamo a un orologio e immaginiamo che ogni parola sia rappresentata da una lancetta (un vettore) che parte dal centro del quadrante, la prima parola verrà ruotata di dieci gradi, la terza di trenta gradi e così via. Questa è considerata un'idea geniale poiché quando il modello calcola l'attenzione tra due parole (usando il prodotto scalare), il risultato dipende solo dalla differenza angolare tra le due lancette. Quindi, applicando una rotazione basata sulla posizione assoluta, il modello impara automaticamente le relazioni di posizione relativa "gratis". RoPE per esempio applica rotazioni position-dependent alle rappresentazioni Query e Key, per due token alle posizioni $m$ e $n$:
 
 \begin{align*}
     q_m &= R(\theta, m) \cdot W^Q h_m \\
     k_n &= R(\theta, n) \cdot W^K h_n
 \end{align*}
 
-dove $R(\theta, \operatorname{pos})$ è la matrice di rotazione dipendente dalla posizione, in questo caso rispettivamente l'ennesima ed emmesima posizione. Le matrici di rotazione possiedono la proprietà fondamentale:
+dove $R(\theta, \operatorname{pos})$ è la matrice di rotazione dipendente dalla posizione, in questo caso l'ennesima e l'emmesima posizione. Le matrici di rotazione possiedono la proprietà fondamentale:
 
 \[
     R(\theta, m)^T R(\theta, n) = R(\theta, n-m)
 \]
 
-Questa proprietà come dicevamo prima, consente al prodotto scalare tra query e key di dipendere solo dalla loro distanza relativa $(n-m)$, ottenendo così un posizionamento relativo naturale. E questo torna utile nel momento in cui si vuole calcolare l'attention score come quanto segue, il quale grazie a questa proprietà subisce una trasformazione nel suo calcolo evidenziandone come lo score dipenda solo dalla differenza:
+Questa proprietà, consente al prodotto scalare tra query e key di dipendere solo dalla loro distanza relativa $(n-m)$, ottenendo così un posizionamento relativo naturale. Torna utile nel momento in cui si vuole calcolare l'attention score come quanto segue, il quale grazie a questa proprietà subisce una trasformazione nel suo calcolo evidenziandone come lo score dipenda solo dalla differenza:
 
 \[
     \operatorname{score}= q_m\cdot k_n = q^TR_m^TR_nk = q^TR_{m-n}k
@@ -172,8 +172,8 @@ Questa proprietà come dicevamo prima, consente al prodotto scalare tra query e 
 Per concludere analizziamo i vantaggi che offre RoPE, i quali sono diversi rispetto agli embedding tradizionali che abbiamo sempre considerato:
 \begin{itemize}
     \item \textbf{Posizionamento Relativo:} Intrinsecamente codifica le relazioni relative, senza effettuare dei calcoli complessi;
-    \item \textbf{Lunghezza Flessibile}: Può gestire sequenze più lunghe di quelle viste durante l'addestramento, perché essendo una rotazione, può girare all'infinito;
-    \item \textbf{Efficienza}: È una tecnica che non aggiunge parametri da apprendere e si integra facilmente con le tecniche di caching KV;
+    \item \textbf{Lunghezza Flessibile:} Può gestire sequenze più lunghe di quelle viste durante l'addestramento, perché essendo una rotazione, può girare all'infinito;
+    \item \textbf{Efficienza:} È una tecnica che non aggiunge parametri da apprendere e si integra facilmente con le tecniche di caching KV;
     \item \textbf{Adozione Diffusa:} Utilizzato in modelli come RoFormer~\cite{su2021roformer}, LLaMA 2~\cite{touvron2023llama}, LLaMA 3~\cite{touvron2024llama3}, Gemma~\cite{google2024gemma}, PaLM~\cite{chowdhery2022palm}, GPT-NeoX~\cite{black2022gptneox}, Falcon~\cite{penedo2023falcon}, DeepSeek V2~\cite{deepseek2023v2}, DeepSeek V3~\cite{deepseek2024v3}, DeepSeek R1~\cite{deepseek2024r1}.
 \end{itemize}
 
@@ -237,11 +237,9 @@ Il processo completo di calcolo dell'attenzione MLA include:
 
 \subsection{Riduzione della Memoria}
 La dimensione del cache per MLA è drasticamente ridotta:
-
 \[
     \text{MLA Cache Size} = \text{batch\_size} \times \text{seq\_length} \times d_c
 \]
-
 dove $d_c$ è significativamente più piccolo della dimensione originale, risultando una grande riduzione di memoria di diversi ordini di grandezza.
 
 \subsection{Prestazioni}
@@ -282,7 +280,7 @@ La scelta della tecnica di attenzione dipende da diversi fattori:
     \item \textbf{Semplicità di Implementazione:} MQA per implementazioni rapide.
 \end{itemize}
 
-\section{Implementazioni Pratiche e Considerazioni}
+\section{Implementazioni Pratiche}
 
 L'implementazione efficiente di queste tecniche richiede considerazioni specifiche:
 

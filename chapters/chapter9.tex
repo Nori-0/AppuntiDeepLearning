@@ -1,9 +1,5 @@
 \chapter{Convolutional Neural Networks}
-
-Le \textbf{Convulutional Neural Network} (CNN) sono ispirate dal funzionamento dell'organizzazione della corteccia visiva animale: così come il nostro cervello riconosce volti, forme, oggetti a partire da stimoli visivi grezzi, le CNN imparano a rilevare caratteristiche visive come bordi, texture e forme, combinandole per riconoscere oggetti più complessi. Le reti neurali che noi conosciamo bene, sono quelle completamente connesse, non adatte per elaborare delle immagini grandi. Considerando il dataset \textbf{CIFAR-10}, le immagini al suo interno sono 32x32x3 pixel, pertanto se dovessimo considerare una rete neurale completamente connessa, essa avrebbe nel suo primo layer ben 3072 pesi per un singolo neurone, il che è un numero notevolmente elevato. Nel momento in cui ci spostiamo a immagini con dimensioni più grandi (e.g 200x200x3) avrò molti più pesi per neurone (e.g 120.000). Questo è uno spreco, portando con gran probablità all'overfitting e inefficienza computazionale. La grande forza delle reti convoluzionali risiede nella ricezione degli input trattandoli come un volume tridimensionale, poiché ha unità che garantiscono ben tre dimensioni (Larghezza, Altezza e Profondità), e ogni layer permette di produrre un nuovo volume tridimensionale chiamato \textit{Activation Volume}. Ogni neurone, a differenza della \textit{fully connected} è connesso solo a una porzione locale dello spazio, chiamata \textit{receptive field}, il valore dell'estensione di questo campo di connettività è un iperparametro.
-\begin{Osservazione}
-    L'estensione della connettività lungo l'asse della profondità è sempre uguale alla profondità del volume di input. Dunque è necessario evidenziare questa trattazione completa della dimensione della profondità rispetto alle altre.
-\end{Osservazione}
+Le \textbf{Convulutional Neural Network} (CNN)~\cite{LeCun1998GradientBasedLearning} prendono ispirazione dal funzionamento dell'organizzazione della corteccia visiva animale, così come il nostro cervello essa riconosce: volti, forme e oggetti a partire da stimoli visivi grezzi. Le CNN sono in grado d'imparare a rilevare caratteristiche visive come: bordi, texture e forme; essendo in grado di combinarle per riconoscere oggetti più complessi. Le reti neurali trattate fin'ora, sono state quelle completamente connesse, non adatte per elaborare delle immagini grandi, infatti se considerassimo il dataset \textbf{CIFAR-10}, le immagini al suo interno sono composte da 32x32x3 pixel, e se dovessimo considerare una rete neurale completamente connessa, avrebbe nel suo primo layer ben 3072 pesi per un singolo neurone, un numero elevato, ma potrebbe essere considerato gestibile. Immaginiamo ora di spostarci a immagini con dimensioni sempre più grandi (e.g 200x200x3), avrò molti più pesi per neurone (e.g 120.000). Questo viene considerato uno spreco, portando all'overfitting e inefficienza computazionale. Proprio quì subentrano le reti convoluzionali, in grado di prendere degli input e trattarli come un volume tridimensionale (Larghezza, Altezza e Profondità), permettendo di produrre un nuovo volume tridimensionale chiamato \textbf{Activation Volume} tramite l'applicazione di \textbf{Filtri}. Ogni neurone, a differenza della \textit{Fully Connected} è connesso solo a una porzione locale dello spazio, chiamata \textbf{Receptive Field}, il valore dell'estensione di questo campo di connettività è un iperparametro.
 
 \begin{figure}
     \centering
@@ -13,16 +9,16 @@ Le \textbf{Convulutional Neural Network} (CNN) sono ispirate dal funzionamento d
 \end{figure}
 
 \section{Analisi dell'architettura}
-La rete convoluzionale è sviluppata diversamente essa è suddivisa in livelli, i quali si occupano di manipolazioni dei dati in maniere differenti e di volta in volta vi è: uno strato convoluzionale, uno strato di attivazione, uno strato di polling e uno strato completamente connesso che viene posto a conclusione della rete. Le \textbf{CNN}, applicano dei filtri, immaginabili come dei piccoli parallelepipedi aventi il compito di concentrarsi su una specifica caratteristica dell'immagine, il filtro scorre attraverso l'altezza e la larghezza della nostra immagine e apporta una convoluzione delle due, ottenendo un risultato, generando una mappa di attivazione (Figura~\ref{fig:convolution_layer}).
+Una Rete Convoluzionale è suddivisa in livelli, i quali si occupano di manipolazioni dei dati in maniere differenti in ognuno di essi: uno strato convoluzionale, uno strato di attivazione, uno strato di polling posto a conclusione di più coppie dei livelli precedenti e infine a conclusione uno strato completamente connesso. Le \textbf{CNN}, applicano dei filtri, immaginabili come dei piccoli parallelepipedi, aventi il compito di concentrarsi su una specifica parte dell'immagine di volta in volta, il filtro scorre attraverso l'altezza e la larghezza della nostra immagine, concentrandosi però su tutta la profondità, apportando una convoluzione generando una mappa di attivazione (Figura~\ref{fig:convolution_layer}).
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.55\textwidth]{figure/CNNConv.png}
-    \caption{A sinistra abbiamo la rappresentazione intera dei nostri input al quale vengono applicati dei filtri, i piccolo parallelepipedi blu, i quali generano degli output, che poi una volta applicati a tutti gli input, portano alla creazione dell'activation layer, visibile in figura sulla destra.}
+    \caption{A sinistra la rappresentazione intera del nostro input al quale viene applicato un filtro ripetutamente, i piccolo parallelepipedi blu, in varie zone dell'input, generando degli output di volta in volta, portano alla creazione dell'activation layer, sulla destra.}
     \label{fig:convolution_layer}
 \end{figure}
 
-Se dovessimo limitarci esclusivamente a una singola caratteristica la rappresentazione presente in Figura~\ref{fig:convolution_layer}, ci potrebbe persino bastare. Per avere un'efficiente riconoscitore d'immagine, si utilizzano però, più filtri compattati, come se fossero un unico filtro, in modo tale da ottenere un'analisi più approfondita, ottenendo ciò che è visibile in figura~\ref{fig:convolution_layer_multifilter}. Prima di generare lo strato di attivazione vi è un'attivazione degli output ottenuti dallo strato di convoluzione, solitamente viene utilizzata la funzione \textbf{ReLU}, ma al posto di questa possiamo utilizzare una qualunque delle funzioni di attivazione presenti nel capitolo~\ref{chpt:5}.
+Se dovessimo limitarci esclusivamente a una singola caratteristica la rappresentazione presente in Figura~\ref{fig:convolution_layer}, sarebbe sufficiente. Per avere un'efficiente riconoscitore d'immagine, si utilizzano però, più filtri compattati, come se fossero un unico filtro, in modo tale da ottenere un'analisi più approfondita su vari aspetti dell'immagine stessa, ottenendo così quello che è visibile nella Figura~\ref{fig:convolution_layer_multifilter}. Ed è proprio qui che lo strato di profondità logicamente si inspessisce, differentemente da ciò che accadeva con il singolo filtro che lo lasciava immutato. A seguito dello strato convolutivo, vi è uno strato di attivazione non lineare, solitamente viene utilizzata la funzione \textbf{ReLU}, ma è possibile utilizzare una qualunque delle funzioni di attivazione presenti nel Capitolo~\ref{chpt:5}, ed è proprio quì che la nostra rete inizia ad apprendere vari elementi dell'immagine di partenza.
 
 
 \begin{figure}[htbp]
@@ -32,64 +28,63 @@ Se dovessimo limitarci esclusivamente a una singola caratteristica la rappresent
     \label{fig:convolution_layer_multifilter}
 \end{figure}
 
-\section{Il filtro e le sue caratteristiche}
+\section{Il filtro}
 
-Quando analizziamo le reti convoluzionali, ci sono diversi layer, i quali si occupano di attività differenti. Adesso soffermiamoci su un layer, nello specifico, in una parte della costituzione di un layer, ossia il filtro. Esso può essere utilizzato in diverse maniere, per poter estrarre il layer di attivazione, la decisione della dimensionalità del filtro non è effettuata a caso, ma deve essere opportunatamente scelta in base alla dimensione dell'input layer. Una caratteristica del filtro molto importante da considerare, è il passo (stride) con cui scorre al di sopra del nostro input layer, ossia di quanto si discosta una volta che ho applicato il filtro la prima volta prima di essere applicato una seconda (Figura~\ref{fig:filter_stride}). 
+Avendo analizzato lo strato di Convoluzione, soffermiamoci un momento su una parte costituente di questo strato: \textbf{il filtro}. Esso viene essere utilizzato con diversi obbiettivi, come effettuare \textit{la decisione della dimensionalità} opportunatamente scelta in base alla dimensione dell'input layer. Il passo o stride del filtro, è una caratteristia molto importante, poiché determina di quanto si discosta il filtro una volta applicato la prima volta, per essere riapplicato iterativamente al di sopra del nostro input layer (Figura~\ref{fig:filter_stride}). 
 \begin{figure}
     \centering
     \includegraphics[width=0.90\textwidth]{figure/Filtering_stride.png}
-    \caption{Applicazione di un filtro a uno stesso input layer, con a sinistra uno passo di uno, mentre a destra con un passo di due, generando a un output layer di dimensionalità differente.}
+    \caption{Applicazione di un filtro a uno stesso input layer, con a sinistra uno passo unitario, mentre a destra un passo di due, generando a un output layer di dimensionalità differente.}
     \label{fig:filter_stride}
 \end{figure}
+Per poter calcolare dunque la dimensione dell'output, si utilizza una semplice formula, che tiene conto della dimensione dell'input ($N$), la dimensione del filtro ($F$) e la dimensione dello stride utilizzato ($S$).
 
-Per calcolare invece la dimensione dell'output, si utilizza una semplice equazione, la quale tiene conto della dimensione dell'input ($N$), la dimensione del filtro ($F$) e la dimensione dello stride utilizzato ($S$).
-
-\begin{equation}
+\[
     Output = \frac{N-F}{S} + 1
-\end{equation}
+\]
 
-Nella pratica invece, viene aggiunto un padding intorno al nostro input layer, prima ancora che venga applicato il filtro con il suo stride. Questo avviene perché, nel momento in cui andiamo ad applicare il filtro, privato di questo padding, riceveremo un rimpicciolimento dell'immagine, che in realtà è il nostro scopo reale, tuttavia dopo numerosi strati l'immagine giunge a delle dimensioni molto ridotte, pertanto non risulta più una riduzione efficiente. Se non applicassimo il padding, i pixel posti ai bordi verrebbero utilizzati molto meno nel calcolo della convoluzione, invece con il padding, tutti i pixel partecipano con la stessa frequenza e importanza a ogni convoluzione. Non utilizzare il padding inoltre, porterebbe a una perdita d'informazione, poiché viene tagliata la parte più esterna dell'immagine, mentre utilizzandolo si conserverebbe più contesto visivo. L'equazione della dimensione dell'otuput pertanto si modifica nel seguente modo:
+Nella pratica questa formula viene arricchita, poiché vi è la necessità di aggiungere un \textbf{Padding} al nostro input, applicato prima ancora che si applichi il filtro. Questo avviene poiché in primis, effettuando un rimpicciolimento dell'immagine (come desiderato), dopo diversi strati, l'immagine giunge a dimensioni molto piccole, non risultando una riduzione efficiente, in secondo luogo spesso nelle convoluzioni gli elementi posti negli angoli, non vengono efficaciemente rappresentati rispetto agli altri più centrali. Grazie al padding queste problematiche vengono arginate, permettendo una riduzione oculata e una partecipazione paritaria dei singoli pixel. L'equazione della dimensione dell'otuput pertanto si modifica nel seguente modo:
 
-\begin{equation}
+\[
     Output = \frac{N+2P-F}{S} +1
-\end{equation}
+\]
 
 \subsection{Filtri 1x1}
 
-I filtri 1x1 nelle reti neurali convoluzionali (CNN) possono sembrare controintuitivi, ma svolgono ruoli fondamentali nell'ottimizzazione e nella potenza espressiva delle reti. Un filtro 1x1 applica una convoluzione su ogni pixel, considerando però tutti i canali (eg. R, G, B) contemporaneamente. Non modifica la dimensione spaziale (altezza e larghezza), ma agisce sulla profondità (numero di canali). Esso può servire per:
+I filtri 1x1 nelle reti neurali convoluzionali (CNN) possono sembrare controintuitivi, ma svolgono ruoli fondamentali nell'ottimizzazione e nella potenza espressiva delle reti. Un filtro 1x1 infatti applica una convoluzione su ogni pixel, considerando però tutti i canali contemporaneamente (e.g R, G, B). Non modifica la dimensione spaziale (altezza e larghezza), ma agisce sulla profondità (numero di canali). Esso può servire per:
 
 \begin{itemize}
     \item \textbf{Riduzione della dimensionalità:} Un filtro 1×1 può ridurre il numero di canali, diminuendo così i parametri e i costi computazionali. Ad esempio, da 256 canali a 64;
     \item \textbf{Aumento della dimensionalità:} Al contrario, può aumentare i canali per arricchire la rappresentazione dei dati;
-    \item \textbf{Aggiunta di non linearità:} Combinato con funzioni di attivazione (eg. ReLU), introduce non-linearità, migliorando la capacità di apprendimento della rete;
+    \item \textbf{Aggiunta di non linearità:} Combinato con funzioni di attivazione (eg. ReLU), introduce un'ulteriore non-linearità, migliorando la capacità di apprendimento della rete;
     \item \textbf{Interazione tra canali:} Permette di combinare informazioni tra diversi canali, facilitando l'apprendimento di caratteristiche complesse.
 \end{itemize}
 
 
 \section{Receptive Fields Estesi}
 
-Il Receptive Field (campo recettivo) è la porzione dell’immagine originale che influenza l’attivazione di un singolo neurone in uno specifico strato. Più si va in profondità nella rete, più il campo visivo del neurone si espande: cominciando a vedere regioni più grandi dell'immagine (Figura~\ref{fig:recp_field}). Questo perché se mi muovo in un layer più profondo oltre a visualizzare alcuni neuroni, vedrò anche ciò che vedono i singoli neuroni a loro volta, e per questo espandero il mio campo recettivo, avendo una visione di insieme, sempre più espansa.
+Il \textbf{Receptive Field} (campo recettivo) è la porzione dell’immagine originale che influenza l’attivazione di un singolo neurone in uno specifico strato. Più si va in profondità nella rete, più il campo visivo del neurone si espande: cominciando a vedere regioni più grandi dell'immagine (Figura~\ref{fig:recp_field}). Questo perché, se mi muovo in un layer più profondo, oltre a visualizzare i neuroni da cui il singolo elmento viene generato, vedrò anche a loro volta i neuroni da cui vengono generati i neuroni su cui mi sto soffermando, e per questo espanderò di volta in volta in ogni layer il mio campo recettivo, avendo una visione di insieme, sempre più espansa.
 \begin{figure}
     \centering
     \includegraphics[width=0.75\textwidth]{figure/receptive_field.png}
-    \caption{Rappresentazione del receptive field, su tre layer}
+    \caption{Rappresentazione del receptive field, su tre layer.}
     \label{fig:recp_field}
 \end{figure}
 Considerando $L$ come il layer in cui ci troviamo e $K$ come il numero di dimensione del filtro, possiamo calcolare il Receptive Field ($R$), nel seguente modo:
 \[
-R = 1 + L \cdot (K - 1)
+    R = 1 + L \cdot (K - 1)
 \]
-Dunque possiamo arrivarci intuitivamente, per ottenere una visione globale dell'immagine che stiamo analizzando, avremo bisogno di numerosi layer convoluzionali.
+Dunque per ottenere una visione globale dell'immagine che stiamo analizzando, avremo bisogno di numerosi layer che mi diminuiscono la dimensionalità.
 \section{Pooling Layer}
 
-I livelli di \textit{Pooling} sono tipicamente interposti tra strati convoluzionali all'interno delle reti neurali convoluzionali (CNN). La loro funzione principale è quella di ridurre progressivamente la dimensione spaziale delle mappe di attivazione, attraverso un processo di \textit{downsampling}. Questo consente di diminuire il numero di parametri e il carico computazionale della rete, mitigare il rischio di overfitting e favorire l’invarianza a piccole traslazioni dell’input. Le operazioni di pooling più comuni includono:
+I livelli di \textbf{Pooling} sono tipicamente interposti tra i vari strati convoluzionali e sono quelli che adoperano realmente la riduzione della dimensionalità, estendendo così il \textit{Receptive Field}. La loro funzione è quella di ridurre progressivamente la dimensione spaziale delle mappe di attivazione, attraverso un processo di \textit{Downsampling}. Questo consente di diminuire il numero di parametri e il carico computazionale della rete, mitigare il rischio di overfitting e favorire l’invarianza a piccole traslazioni dell’input. Le operazioni di Pooling più comuni includono:
 \begin{itemize}
     \item \textbf{Max Pooling:} seleziona il valore massimo all'interno di una finestra locale (kernel) sull'immagine di input;
     \item \textbf{Average Pooling:} calcola la media dei valori nella regione coperta dal kernel;
     \item \textbf{Sum Pooling:} somma tutti i valori nella regione considerata;
 \end{itemize}
 
-Attraverso il pooling si ottiene una rappresentazione più compatta delle mappe di caratteristiche, preservando le informazioni più salienti. Questo processo di sottocampionamento permette alla rete di concentrarsi sulle caratteristiche più significative, riducendo al contempo la sensibilità a piccole variazioni locali. Combinando in modo efficace strati convoluzionali e di pooling, una CNN è in grado di apprendere progressivamente rappresentazioni gerarchiche dell’input, rilevando strutture sempre più complesse come bordi, texture, oggetti o intere scene. Infine, l’output dello strato convoluzionale finale viene \textit{appiattito} in un vettore monodimensionale, che viene successivamente fornito a uno o più strati completamente connessi (\textit{fully connected}) per eseguire il compito di classificazione.
+Attraverso il Pooling si ottiene una rappresentazione più compatta delle mappe di caratteristiche, permettendo alla rete di concentrarsi sulle caratteristiche più significative, riducendo al contempo la sensibilità a piccole variazioni locali. Combinando in modo efficace, strati convoluzionali, di attivazione e di pooling, una CNN è in grado di apprendere progressivamente, rappresentazioni gerarchiche dell’input, rilevando strutture sempre più complesse come: bordi, texture, oggetti o intere scene. Infine, l’output dello strato convoluzionale finale viene \textit{appiattito} in un vettore monodimensionale, che viene successivamente fornito a uno o più strati completamente connessi (\textit{fully connected}) per eseguire il compito di classificazione.
 
 \begin{figure}[ht]
     \centering
@@ -100,7 +95,7 @@ Attraverso il pooling si ottiene una rappresentazione più compatta delle mappe 
 
 \section{Conclusioni}
 
-Le reti neurali convoluzionali (CNN) sfruttano in modo efficiente la struttura spaziale delle immagini attraverso tre principi fondamentali: la connettività locale, la condivisione dei pesi mediante l’impiego di filtri convoluzionali, e l’organizzazione gerarchica dei livelli. Questi elementi architetturali consentono una significativa riduzione del numero di parametri, migliorano la capacità di generalizzazione del modello e rendono la rete scalabile su immagini di grandi dimensioni. L’uso della connettività locale permette di concentrarsi su porzioni limitate dell’input, mentre la condivisione dei pesi garantisce l’invarianza traslazionale e riduce il costo computazionale. Al termine della sequenza di strati convoluzionali e di pooling, le mappe di attivazione vengono appiattite e passate a uno o più strati completamente connessi (\textit{fully connected layers}), i quali svolgono la fase finale di classificazione. Questo approccio modulare e gerarchico rende le CNN particolarmente adatte a compiti complessi di riconoscimento visivo, come dimostrato in molteplici contesti applicativi già trattati in corsi precedenti.
+Le reti neurali convoluzionali (CNN) sfruttano in modo efficiente la struttura spaziale delle immagini attraverso tre principi fondamentali: connettività locale, condivisione dei pesi filtrati e l’organizzazione gerarchica dei livelli. Questi elementi architetturali consentono una significativa riduzione del numero di parametri, migliorano la capacità di generalizzazione del modello e rendono la rete scalabile su immagini di grandi dimensioni. L’uso della connettività locale permette di concentrarsi su porzioni limitate dell’input, la condivisione dei pesi garantisce l’invarianza traslazionale e riduce il costo computazionale. L'approccio modulare e gerarchico, rende le CNN adatte a compiti complessi di riconoscimento visivo.
 
 \begin{figure}[ht]
     \centering

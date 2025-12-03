@@ -1,31 +1,25 @@
-\chapter{Generative Adversarial Networks}
+\chapter{GAN}
 
-Le \textbf{Generative Adversarial Networks} (GAN), introdotte da \textit{Ian Goodfellow} nel 2014~\cite{goodfellow2014generative}, rappresentano una delle nuove idee nel campo dell’Intelligenza Artificiale. Si tratta di una classe di reti neurali progettate per generare dati nuovi e realistici, a partire da esempi osservati. Alla base della generazione di dati realistici c’è sempre un processo di trasformazione di semplici variabili casuali (spesso uniformi) in variabili complesse. Nonostante i calcolatori siano sistemi \textbf{deterministici} (dato un input, producono sempre lo stesso output), è comunque possibile costruire algoritmi capaci di generare sequenze numeriche che si comportano similmente a sequenze casuali. Questi algoritmi, detti \textbf{Pseudo-Random Generators}, permettono di produrre numeri che approssimano una distribuzione uniforme sull’intervallo $[0,1]$. A partire da questa base, esistono diverse tecniche per ottenere variabili casuali con distribuzioni sempre più sofisticate. Tutti questi metodi sfruttano "trucchi" matematici diversi, ma condividono un'idea comune: ottenere variabili casuali complesse come risultato di una trasformazione applicata a variabili semplici.
+Le \textbf{Generative Adversarial Networks} (GAN), introdotte da \textit{Ian Goodfellow} nel 2014~\cite{goodfellow2014generative}, rappresentano una tecnica nel campo dell’Intelligenza Artificiale diversa dalle altre. Si tratta di una classe di reti neurali progettate per generare dati nuovi e realistici, a partire da esempi osservati. Alla base della generazione di dati realistici c’è sempre un processo di trasformazione di semplici variabili casuali (spesso uniformi) in variabili complesse. Nonostante i calcolatori siano sistemi \textbf{deterministici} (dato un input, producono sempre lo stesso output), è comunque possibile costruire algoritmi capaci di generare sequenze numeriche che si comportano similmente a sequenze casuali. A partire da questa base, esistono diverse tecniche per ottenere variabili casuali con distribuzioni sempre più sofisticate. Tutti questi metodi sfruttano "trucchi" matematici diversi, ma condividono un'idea comune: ottenere variabili casuali complesse come risultato di una trasformazione applicata a variabili semplici.
 
-\section{La Trasformazione Inversa}
-
-Una tecnica semplice è il metodo della trasformazione inversa. Supponiamo di voler generare una variabile casuale $X$ che segua una distribuzione con funzione di distribuzione cumulativa $F_X(x)$. L’idea è partire da una variabile casuale $u$ distribuita uniformemente in $\mathcal{U}(0,1)$, e ottenere $x$ tramite:
-\begin{equation}
-    x = F_X^{-1}(u)
-\end{equation}
-In questo modo, $x$ sarà distribuito secondo la legge desiderata. L’idea si può estendere anche a funzioni di trasformazione generali, che mappano variabili semplici (non necessariamente uniformi) in variabili con una distribuzione target.
-
-\begin{figure}
+\begin{figure}[hbtp]
     \centering
     \includegraphics[width=\textwidth]{figure/InvTrasf.png}
-    \caption{In blu, la distribuzione uniforme su $[0,1]$; in arancione, una distribuzione gaussiana standard; in grigio, le linee che mostrano la mappatura dalla distribuzione uniforme a quella gaussiana.}
+    \caption{In blu, la distribuzione uniforme su $[0,1]$ mentre in arancione, una distribuzione gaussiana standard, in grigio, le linee che mostrano la mappatura dalla distribuzione uniforme a quella gaussiana.}
     \label{fig:invTrasf}
 \end{figure}
 
+\section{La Trasformazione Inversa}
+
+Una tecnica semplice è il metodo della \textbf{Trasformazione Inversa}. Supponiamo di voler generare una variabile casuale $X$ che segua una distribuzione con funzione di distribuzione cumulativa $F_X(x)$. L’idea è partire da una variabile casuale $u$ distribuita uniformemente in $\mathcal{U}(0,1)$, e ottenere $x$ tramite:
+\[
+    x = F_X^{-1}(u)
+\]
+In questo modo, $x$ sarà distribuito secondo la legge desiderata. L’idea si può estendere anche a funzioni di trasformazione generali, che mappano variabili semplici (non necessariamente uniformi) in variabili con una distribuzione target.
+
 \section{Modelli Generativi}
 
-Se volessimo generare immagini in bianco e nero di cani, con dimensione $n \times n$ pixel. Ogni immagine può essere "linearizzata" in un vettore $N$ di lunghezza $n^2$, mettendo le colonne una sopra l’altra. In questo modo, ogni immagine può essere rappresentata da un punto nello spazio vettoriale $\mathbb{R}^N$. Ma attenzione: non tutti i vettori in $\mathbb{R}^N$ rappresentano cani. Solo una piccola regione di questo spazio contiene vettori che corrispondono a immagini di cani, possiamo allora immaginare l’esistenza di una distribuzione di probabilità su $\mathbb{R}^N$, che chiameremo "distribuzione dei cani", la quale assegna alta probabilità ai vettori che rappresentano immagini realistiche di cani, e probabilità molto bassa a tutto il resto. Generare un'immagine realistica significa campionare da questa "distribuzione dei cani". Tuttavia, questo ci pone di fronte a due sfide:
-\begin{itemize}
-    \item La distribuzione è molto complessa e vive in uno spazio ad altissima dimensione;
-    \item Anche se possiamo osservarne alcuni campioni (cioè immagini vere), non sappiamo come descriverla formalmente con una formula.
-\end{itemize}
-
-Poiché non possiamo scrivere esplicitamente la distribuzione, possiamo invece lavorare sui campioni: confrontiamo immagini vere e immagini generate, e ottimizziamo il nostro modello per fare in modo che le seconde somiglino sempre di più alle prime. Questo porta a una procedura di addestramento tipica dei modelli generativi, che segue i seguenti passi:
+Se volessimo generare immagini in bianco e nero di cani, con dimensione $n \times n$ pixel. Ogni immagine può essere "linearizzata" in un vettore $N$ di lunghezza $n^2$, mettendo le colonne una sopra l’altra. In questo modo, ogni immagine può essere rappresentata da un punto nello spazio vettoriale $\mathbb{R}^N$. Una cosa a cui bisogna stare attenti, è che non tutti i vettori in $\mathbb{R}^N$ rappresentano cani, infatti solo una piccola regione di questo spazio contiene vettori che corrispondono a immagini di cani. La distribuzione che vogliamo seguire la chiamiamo "distribuzione dei cani", ma come già detto è una distribuzione molto complessa in uno spazio notevolmente più grande, e non sappiamo ovviamente come esprimerla esplicitamente, pertanto il nostro obbiettivo di generare elementi che seguino questa distribuzione, diventa di una complessità notevole. Per rendere più semplice questo compito si è pensato di far riferimento ai campioni, delle immagini vere e di quelle generate, ottimizzando il nostro modello per riduerre la distanza dei campioni di volta in volta, facendo sì che le immagini si somiglino fra di loro. Seguendo pressocché gli stessi passaggi effettuati da un modello generativo:
 
 \begin{enumerate}
     \item Generare input casuali da una distribuzione semplice (es. uniforme);
@@ -36,40 +30,66 @@ Poiché non possiamo scrivere esplicitamente la distribuzione, possiamo invece l
 
 \section{GAN}
 
-Le \textbf{GAN} sono una potente architettura generativa che adotta una strategia diversa: invece di confrontare direttamente le distribuzioni, il modello impara attraverso un compito indiretto. In particolare, due reti neurali vengono addestrate in competizione tra loro, dette generatore e discriminatore:
-
-\begin{itemize}
-    \item Il \textbf{Generatore} cerca di produrre dati così realistici da ingannare il discriminatore;
-    \item Il \textbf{Discriminatore} cerca di distinguere i dati reali da quelli generati.
-\end{itemize}
-
-Il generatore migliora cercando di ingannare sempre meglio il discriminatore, mentre il discriminatore affina le sue capacità per non farsi ingannare. Questo processo competitivo spinge entrambi i modelli a migliorare continuamente.
+Le \textbf{GAN} (Generative Adversarial Networks)~\cite{goodfellow2014generative}, sono una potente architettura generativa che adotta una strategia diversa: invece di confrontare direttamente le distribuzioni o i singoli campioni, il modello impara attraverso un compito indiretto. L'allenamento forza la distribuzione generata ad avvicinarsi sempre più alla distribuzione reale dei dati, questo avviene utilizzando un task di discriminazione dei valori generati e dei valori reali, l'obbiettivo cardine è che questa discriminazione fallisca il più possibile, così che le due distribuzioni ottenute risultino praticamente uguali. Per effettuare la generazione e il task di discriminazione delle distribuzioni, avviene un addestramento di due reti neurali in competizione tra loro, dette una \textit{Generatore} e \textit{Discriminatore}.
 
 \subsection{Metodo diretto}
 
-Nel metodo diretto, se conoscessimo esplicitamente la distribuzione da cui vogliamo generare i dati (per esempio una Gaussiana), potremmo confrontare la distribuzione generata con quella vera e aggiornare il generatore per ridurre la differenza. Tuttavia, come già detto, nel caso di dati complessi, come le immagini, non conosciamo la distribuzione reale in modo esplicito, pertanto questo approccio non risulta praticabile.
+Il metodo chiamato \textit{diretto} si basa sull'aggiustare iterativamente il generatore, tramite le iterazioni della discesa del gradiente, in modo tale da correggere la differenza misurata degli errori fra la distribuzione generata e quella dei valori reali. Ovviamente il processo di ottimizzazione (Figura~\ref{fig:dirMeth}), si conclude con la distribuzione generata che aderisce perfettamente a quella dei valori reali.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figure/DIrectMethod.png}
+    \caption{Grafico che mostra come la distribuzione reale (in blu) e la distribuzione generata (in arancione), in un momento intermedio dell'allenamento del generatore, le quali con il passare del tempo tenderanno a sovrapporsi.}
+    \label{fig:dirMeth}
+\end{figure}
 
 \subsection{Metodo indiretto}
 
-Nel metodo indiretto, si introduce un discriminatore che ha il compito di classificare i dati come veri o falsi. Se la distribuzione dei dati generati è molto diversa da quella reale, il discriminatore li distinguerà facilmente. Quando invece le due distribuzioni iniziano a sovrapporsi, il discriminatore farà sempre più fatica, e le sue previsioni si avvicineranno al 50\%. Il generatore viene quindi addestrato per \textit{"confondere"} il discriminatore, generando dati sempre più realistici. Più riesce a farlo, più significa che le due distribuzioni si stanno avvicinando.
+Per utilizzare un approccio \textit{indiretto}, invece si considera anche un discriminatore, il quale assumiamo per il momento come se sia un oracolo il quale conosce esattamente la distribuzione reale e a quella generata, e grazie a questa informazione sia in grado di determinare l'appartenenza a una data classe per ogni punto fornito in input. Se le due distribuzioni sono distanti fra loro, il discriminatore sarà in grado di determinare facilmente la differenza fra le due, con un livello di confidenza molto alto su la maggior parte dei punti che li forniamo. Se volessimo ingannare il discriminatore, dobbiamo fare in modo che la distribuzione generata risulti essere più vicina a quella reale, così che il discriminatore abbia più difficoltà nel predirre la classe di appartenenza nel momento in cui le due distribuzioni sono uguali in tutti i punti. Pertanto ci sarà una equa probabilità in ogni punto che appartengano alla distribuzione reale o quella dei dati generati, e dunque il discriminatore non potrà fare altro che centrare la previsione il $50\%$ delle volte.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figure/IndirectMethod.png}
+    \caption{Grafico che mostra la distribuzione dei dati reali (in blu) e dei dati generati (in arancione), e l'andamento del discriminatore (in grigio), il quale segue la scala presente alla sinistra del grafico, in cui si vede che nei punti di sovrapposizione dei due grafici si giunge a un $50\%$ di probabilità.}
+    \label{fig:indMeth}
+\end{figure}
+A questo punto, può esser legittimo chiedersi se questo metodo indiretto sia davvero una buona idea visto che sembra essere più complicato e richiede un discriminatore che qui consideriamo come un oracolo dato, ma che, in realtà, non è né noto né perfetto. In realtà la difficoltà di confrontare direttamente due distribuzioni di probabilità basate sui campioni, controbilancia l'apparente maggiore complessità del metodo indiretto. Mentre il discriminatore sebbene non sia noto, può essere facilmente appreso.
 
-\subsection{Visione probabilistica}
+\subsection{I due modelli}
 
-Dal punto di vista probabilistico, il generatore prende in input una variabile latente $z$ (ad esempio, un campione da una distribuzione normale) e produce un’uscita $x' = G(z)$, che dovrebbe assomigliare a un dato reale. Il discriminatore, invece, prende un dato e restituisce la probabilità che esso sia reale: $D(x) \in [0,1]$. I due modelli vengono ottimizzati in maniera congiunta, ma con obiettivi opposti:
+Nella creazione di questi due modelli, il generatore prende una variabile casuale $z$ a partire da una distribuzione uniforme $\mathcal{U}$ o normale $\mathcal{N}$, viene mandata come input al generatore e otterremo $x=G(z)$ dove il valore dell'output $x$ sarà un elemento nella distribuzione di probabilità dei dati generati che seguirà la distribuzione dei dati desiderata $p_g(x)\approx p_{data}(x)$. Per quanto riguarda il discriminatore, ovviamente non sarà un oracolo in grado di distinguere a priori i dati d'ingresso, ma riceverà come input un dato o appartenente alla distribuzione generata, o alla distribuzione reale $z$ e restituirà, un valore appartenente all'intervallo $[0,1]$, dove se il valore si avvicina a $0$ sarà un elemento appartenente alla distribuzione generata, mentre se si avvicina a $1$ a quella dei dai reali. I due modelli a ogni iterazione portano ad aggiornare i pesi di volta in volta per seguire gli obbiettivi seguenti:
+
 \begin{itemize}
-    \item Il generatore cerca di far sì che $D(G(z)) \approx 1$, ovvero che il discriminatore creda che l’output generato sia reale;
-    \item Il discriminatore cerca di distinguere correttamente i dati veri da quelli falsi.
+    \item \textbf{Generatore:} Massimizzare l'errore di classificazione, in modo tale da riuscire ingannare per bene il discriminatore;
+    \item \textbf{Discriminatore:} Minimizzare l'errore di classificazione, così da distinguere per bene i dati reali, da quelli ottenuti dal generatore;
 \end{itemize}
 
-Matematicamente, il generatore può essere visto come un ottimizzatore che vuole massimizzare la probabilità che i suoi output vengano classificati come reali:
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figure/TrainGan.png}
+    \caption{Flusso di lavoro di una GAN. L'addestramento si basa su un gioco a somma zero: il Generatore prende variabili casuali in input e produce dati falsi (arancioni), mirando a ingannare il Discriminatore. Il Discriminatore riceve sia dati reali (blu) che generati, e viene addestrato a minimizzare l'errore di classificazione, separando le due distribuzioni (linea tratteggiata).}
+    \label{fig:trainGAN}
+\end{figure}
 
-\begin{equation}
-    \min_G \left\{ \log(1-D(G(z))\right\}\approx \max_G\left\{-\log(D(G(z))\right\}
-\end{equation}
+\subsection{Visione probabilistica}
+Il Discriminatore è un classificatore binario il quale si occupa di determinare se l'input ricevuto sia reale, ricevuto dalla distribuzione reale, o falso, ricevuto dalla distribuzione generata. Assumendo che la label $y$ per i dati veri sia pari a $1$ e $0$ per i dati generati. Alleneremo il discriminatore a minimizzare la Binary Cross Entropy Loss seguente:
 
-L’intero processo può essere descritto come un problema min-max, in cui il discriminatore e il generatore si sfidano:
-\begin{equation}
-    \min_D\max_G\left\{-E_{x\sim Data} \log D(x) - E_{x\sim Noise}\log(1-D(G(z))\right\}
-\end{equation}
+\[
+    \min_D\{-y\log(D(x))-(1-y)\log(1-D(x))\}
+\]
+Dove chiaramente se stiamo trattando con i dati reali, rimarrà soltanto la prima parte e nel caso in cui il Discriminatore determina che stiamo analizzando un dato reale $D(x)\approx1$ e avrò una bassa perdità poiché il logaritmo di 1 è zero, differentemente avrò un'alta perdita. Nel caso in cui stiamo trattando i dati falsi (generati), rimarrà solo la seconda parte con ovviamente una bassa perdita se $D(x)\approx 0$, sennò avremo un'alta perdita. Per il generatore invece, si prende in input una variabile latente $z$ da una sorgente di numeri pseudo-casuali, ad esempio, un campione da una distribuzione normale. Successivamente applichiamo la funzione per generare un'uscita $x' = G(z)$, che dovrebbe assomigliare a un dato reale, poiché il nostro obbiettivo è ingannare il Discriminatore per ottenere $D(G(z))\approx1$. In altre parole, dato un Discriminatore aggiorniamo i parametri del Generatore per massimizzare la Binary Cross Entropy Loss quando $y=0$:
 
-Questa formulazione rappresenta il cuore delle GAN: uno sport con due giocatori che si allenano fra loro, fino a raggiungere un equilibrio in cui il generatore produce dati indistinguibili da quelli reali.
+\[
+    \max_G\{-(1-y)\log(1-D(G(z)))\} = \max_G\{-\log(1-D(G(z)))\}
+\]
+
+Tuttavia vi è un problema non ignorabile, legato al fatto che nelle prime fasi il Discriminatore risulti essere molto bravo, portando a non permettere al Generatore di imparare poiché porta a saturazione, pertanto Goodfellow~\cite{goodfellow2014generative}, fa notare come se optiamo per quest'altra ottimizzazione non incorreremo nello stesso problema:
+
+\[
+    \max_G\{-\log(D(G(z)))\}
+\]
+Infine l’intero processo può essere descritto come un problema min-max, in cui il discriminatore e il generatore si sfidano a vicenda:
+\[
+    \min_D\max_G\left\{-\mathbb{E}_{x\sim Real}( \log D(x) )- \mathbb{E}_{z\sim Fake}(\log(1-D(G(z))))\right\}
+\]
+
+Questa formulazione rappresenta il cuore delle GAN: uno sport con due giocatori che si allenano fra loro, fino a raggiungere un equilibrio in cui il generatore produce dati indistinguibili da quelli reali, detto \textit{Equilibrio di Nash}~\cite{Nash1951}.

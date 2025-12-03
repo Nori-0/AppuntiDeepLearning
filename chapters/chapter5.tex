@@ -2,7 +2,7 @@
 Le funzioni di attivazione sono molto importanti nelle reti neurali, in quanto introducono la non-linearità nel modello, permettendo di apprendere relazioni complesse nei dati. Senza funzioni di attivazione, una rete neurale profonda risulterebbe equivalente a una semplice trasformazione lineare.
 
 \section{Vanishing Gradient Problem}
-Uno dei problemi nell'addestramento delle reti neurali profonde è il \textbf{Vanishing Gradient Problem}, una problematica che viene a verificarsi, quando il gradiente venendo propagato all'indietro diventa molto piccolo, a causa di ciò, smetterà di imparare. È un problema frequente nell'utilizzare funzioni di attivazione come la \textbf{sigmoide} e la \textbf{tangente iperbolica}, poiché visionando i loro grafici, possiamo notare come ci siano grandi tratti dedicati al valore zero e al valore unitario. A causa di questa polarizzazione, i valori non si distinguono fra loro in maniera netta, pertanto tenderanno a scomparire.
+Uno dei problemi nell'addestramento delle reti neurali profonde è il \textbf{Vanishing Gradient Problem}~\cite{hochreiter1991untersuchungen,bengio1994learning}, una problematica che viene a verificarsi, quando il gradiente venendo propagato all'indietro diventa molto piccolo, a causa di ciò, smetterà di imparare. È un problema frequente nell'utilizzare funzioni di attivazione come la \textbf{Sigmoide} e la \textbf{Tangente Iperbolica}, poiché visionando i loro grafici, possiamo notare come ci siano grandi tratti dedicati al valore zero e al valore unitario. A causa di questa polarizzazione, le loro derivate avranno lunghi tratti vicini allo zero, portando a una non distinzione in maniera netta dei valori dei gradienti, pertanto essendo molti, vicino allo zero, tenderanno a scomparire, saturandone l'output.
 
 \begin{figure}[h]
     \centering
@@ -11,18 +11,18 @@ Uno dei problemi nell'addestramento delle reti neurali profonde è il \textbf{Va
 \end{figure}
 
 \section{Funzioni non saturanti}
-Per risolvere il problema, vengono utilizzate funzioni di attivazione dette \textbf{non-saturanti}, come:
+Per risolvere questo problema, vengono utilizzate funzioni di attivazione dette \textbf{Non Saturanti}, come:
 \begin{itemize}
-    \item \textbf{ReLU (Rectified Linear Unit):} elimina i valori negativi rendendo i calcoli più efficienti, crea però dei problemi legati al gradiente dei valori negativi, rendendoli tutti uguali e anche una mancata derivabilità nell'origine;
-    \begin{equation}
+    \item \textbf{ReLU (Rectified Linear Unit):} elimina i valori negativi rendendo i calcoli più efficienti, crea però dei problemi legati al gradiente dei valori negativi, rendendoli tutti uguali, inoltre soffre di un problema legato alla mancata derivabilità nell'origine, non favorevole alla computazione della discesa del gradiente;
+    \[
         \operatorname{ReLU}(x) = \max(0, x)
-    \end{equation}
+    \]
     \item \textbf{Leaky ReLU:} introduce una piccola pendenza per i valori negativi, riuscendo a ridurre il problema creatosi con la \textit{ReLU};
-    \begin{equation}
+    \[
         \operatorname{LeakyReLU}(x) = \max(\alpha x, x)
-    \end{equation}
-    \item \textbf{PReLU (Parametric ReLU):} simile a Leaky ReLU, unica differenza è la pendenza dei valori negativi, il quale viene appreso durante l'addestramento, permettendo di avere una pendenza più incisiva;
-    \item \textbf{RReLU (Randomized ReLU)}: la pendenza anche qui viene appresa durante l'addestramento, ma si basa su una variabile casuale.
+    \]
+    \item \textbf{PReLU (Parametric ReLU):} simile a Leaky ReLU, con l'unica differenza della pendenza nei valori negativi, la quale viene appresa durante l'addestramento, permettendo di avere una pendenza più incisiva;
+    \item \textbf{RReLU (Randomized ReLU)}: la pendenza anche qui viene appresa durante l'addestramento, ma si basa su una variabile casuale spostandosi all'interno di un range prefissato.
 \end{itemize}
 
 \begin{figure}[h]
@@ -42,8 +42,8 @@ Oltre alle funzioni non saturanti, esistono altre funzioni di attivazione avanza
 \begin{itemize}
     \item \textbf{ELU (Exponential Linear Unit):} permette l'utilizzo di valori negativi tramite una decrescita esponenziale, migliorando la stabilità;
     \item \textbf{SELU (Scaled ELU):} nei valori positivi lavora esattamente come una funzione lineare scalata, mentre per quelli negativi si ricurva gradualmente, come succede nella ELU, tuttavia utilizzando un fattore di scala, permettendo di prevenire che i neuroni diventino inattivi;
-    \item \textbf{GELU (Gaussian Error Linear Unit):} utilizza una distribuzione gaussiana, utilizzata moltiplicandola per i valori ottenuti e avere delle transizioni più fluide fra i valori positivi e negativi;
-    \item \textbf{Softplus}: è un'approssimazione allisciata della funzione rampa vista precedentemente grazie alla funzione non saturante ReLU, la quale permette di avere delle transizioni più dolci.
+    \item \textbf{GELU (Gaussian Error Linear Unit):} utilizza una distribuzione gaussiana, moltiplicandola per i valori ottenuti, avendo così delle transizioni più fluide fra i valori positivi e quelli negativi;
+    \item \textbf{Softplus:} è un'approssimazione allisciata della funzione rampa vista precedentemente grazie alla funzione non saturante ReLU, la quale permette di avere delle transizioni più dolci.
 \end{itemize}
 
 \begin{figure}[h]
@@ -72,32 +72,189 @@ Oltre alle funzioni non saturanti, esistono altre funzioni di attivazione avanza
 Tutte queste funzioni di attivazione, permettono di avere un taglio non netto, fra valori negativi e positivi, garantendo una similarità fra i valori presenti prima e dopo l'origine.
 
 \section{Funzioni Normalizzanti}
-Oltre alle moderne funzioni non saturanti, che sono diventate lo standard nella maggior parte delle reti profonde, esiste un'altra categoria di funzioni storicamente importanti o utilizzate in contesti specifici. A differenza delle funzioni come ReLU, il cui scopo principale è introdurre non-linearità mitigando il problema dei gradienti che svaniscono, le funzioni che seguono sono progettate per limitare i valori di output in modi molto specifici. Sebbene alcune di esse, come la funzione soglia (Treshold), siano oggi computazionalmente superate per l'addestramento di reti profonde, la loro comprensione è utile sia dal punto di vista storico sia perché i loro concetti di base riemergono in contesti più avanzati, come la regolarizzazione e l'elaborazione dei segnali.
+Oltre alle moderne funzioni non saturanti, diventate lo standard nella maggior parte delle reti profonde, esiste un'altra categoria di funzioni storicamente importanti, utilizzate in contesti specifici. A differenza delle funzioni come ReLU, il cui scopo principale è introdurre non-linearità mitigando il problema dei gradienti che svaniscono, le funzioni che seguono, sono progettate per limitare i valori di output in modi specifici. Sebbene alcune di esse, come la funzione soglia (Treshold), siano oggi computazionalmente superate per l'addestramento di reti profonde, la loro comprensione è utile sia dal punto di vista storico sia perché i loro concetti di base riemergono in contesti più avanzati, come la \textit{regolarizzazione} e l'\textit{elaborazione dei segnali}.
 
 \begin{itemize}
     \item \textbf{Hardtanh:} la $\operatorname{tanh}$ ha una curva a forma di "S" che si avvicina asintoticamente a $-1$ e $+1$, la $\operatorname{Hardtanh}$ sostituisce questa curva con una funzione lineare a tratti. È una retta con pendenza 1 nell'intervallo $[-1, 1]$ e assume valori costanti al di fuori di questo intervallo. Evita il calcolo di funzioni esponenziali, e sebbene saturi in valori al di fuori dell'intervallo la transizione è netta e non graduale, il che in alcuni contesti può aiutare a gestire meglio il problema dei gradienti che svaniscono;
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    axis lines=middle,
+    xlabel={$x$},
+    ylabel={$f(x)$},
+    xlabel style={at=(current axis.right of origin), anchor=west},
+    ylabel style={at=(current axis.above origin), anchor=south},
+    title={Grafico della funzione Hardtanh},
+    title style={yshift=2ex},
+    xmin=-3.2, xmax=3.2,
+    ymin=-1.7, ymax=1.7,
+    xtick={-2, -1, 1, 2},
+    ytick={-1, 1},
+    tick style={color=black}, 
+    no markers, 
+    samples=100, 
+]
+\addplot[
+    thick,
+    blue!60!black, 
+    domain=-3:3
+] { max(-1, min(1, x)) };
+
+\draw[dashed, gray!70] (axis cs: 0, 1) -- (axis cs: 1, 1) -- (axis cs: 1, 0);
+\draw[dashed, gray!70] (axis cs: 0, -1) -- (axis cs: -1, -1) -- (axis cs: -1, 0);
+
+\end{axis}
+\end{tikzpicture}
+\caption{La funzione $\text{Hardtanh}(x)$, usata come funzione di attivazione. È un'approssimazione lineare della funzione tangente iperbolica ($\tanh$).}
+\end{figure}
+
     \item \textbf{Threshold:} Questa è la funzione di attivazione più semplice e storicamente, la prima ad essere stata utilizzata, fra gli anni '60 e '70, ispirata al modello "tutto o niente" del neurone biologico. Essendo la sua derivata zero, praticamente ovunque, è stata immediatamente rigettata per gli studi sulle rete neurali profonde;
-    \item \textbf{Shrink Functions (Tanhshrink, Softshrink, Hardshrink):} Queste funzioni non sono tipicamente usate come attivazioni principali negli strati nascosti, ma piuttosto in contesti di regolarizzazione, sparse coding (codifica sparsa) o elaborazione dei segnali. Il loro scopo è quello di "contrarre" (shrink) i valori di input verso lo zero, eliminando o riducendo il "rumore" di bassa ampiezza.
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+    \begin{axis}[
+        axis lines=middle,
+        xlabel={$x$},
+        ylabel={$f(x)$},
+        xlabel style={at=(current axis.right of origin), anchor=west},
+        ylabel style={at=(current axis.above origin), anchor=south},
+        title={Grafico della funzione Threshold},
+        title style={yshift=2.5ex},
+        xmin=-3.2, xmax=3.2,
+        ymin=-0.7, ymax=1.7,
+        xtick={-2, -1, 1, 2},
+        ytick={1}, 
+        tick style={color=black},
+        no markers,
+    ]   
+    \addplot[
+        thick,
+        blue!60!black, 
+        domain=-3:0
+    ] {0};
+    \addplot[
+        thick,
+        blue!60!black, 
+        domain=0:3
+    ] {1};
+    \addplot[
+        only marks,
+        mark=o, 
+        mark options={fill=white},
+        blue!60!black,
+        thick 
+    ] coordinates {(0,0)};
+
+
+    \addplot[
+        only marks,
+        mark=*, 
+        blue!60!black
+    ] coordinates {(0,1)};
+
+    \end{axis}
+    \end{tikzpicture}
+    \caption{La funzione $\text{Threshold}(x)$, nota anche come funzione a gradino di Heaviside.}
+\end{figure}
+
+    \item \textbf{Shrink Functions (Tanhshrink, Softshrink, Hardshrink):} Queste funzioni non sono tipicamente usate come attivazioni negli strati nascosti, ma in contesti di regolarizzazione, sparse coding (codifica sparsa) o elaborazione dei segnali. Il loro scopo è quello di "contrarre" (shrink) i valori di input verso lo zero, eliminando o riducendo il "rumore" di bassa ampiezza.
+\begin{figure}[h!]
+    \centering
+\begin{adjustbox}{width=0.7\textwidth}
+\begin{tikzpicture}
+\begin{axis}[
+    axis lines=middle,
+    xlabel={$x$},
+    ylabel={$f(x)$},
+    xlabel style={at=(current axis.right of origin), anchor=west},
+    ylabel style={at=(current axis.above origin), anchor=south},
+    title={Funzioni Shrink a confronto},
+    title style={yshift=2.5ex}, 
+    xmin=-4.2, xmax=4.2,
+    ymin=-3.2, ymax=3.2,
+    xtick={-4, -3, -2, -1, 1, 2, 3, 4},
+    ytick={-3, -2, -1, 1, 2, 3},
+    tick style={color=black},
+    no markers,
+    samples=101,
+    legend style={
+        at={(1.05,0.2)},
+        anchor=west,
+        draw=none, 
+        fill=none, 
+        font=\footnotesize, 
+        row sep=1ex,
+    },
+]
+
+\addplot[
+    dashed, gray!200,
+    domain=-4:4
+] {x};
+\addlegendentry{$y=x$};
+
+\addplot[
+    thick,
+    blue!60!black, 
+    domain=-4:4
+] {x - tanh(x)};
+\addlegendentry{TanhShrink};
+
+\addplot[
+    thick,
+    red!60!black, 
+    domain=-4:4
+] { (\x > 1.0) ? (\x - 1.0) : ( (\x < -1.0) ? (\x + 1.0) : 0 ) };
+\addlegendentry{SoftShrink ($\lambda=1$)};
+
+\addplot[
+    thick,
+    orange!70!black, 
+    domain=-4:-1,
+    forget plot 
+] {x};
+\addplot[
+    thick,
+    orange!70!black, 
+    domain=-1:1
+] {0};
+\addlegendentry{HardShrink ($\lambda=1$)};
+\addplot[
+    thick,
+    orange!70!black, 
+    domain=1:4,
+    forget plot 
+] {x};
+\end{axis}
+\end{tikzpicture}
+\end{adjustbox}
+    \caption{Confronto tra le funzioni di "shrinkage" TanhShrink, SoftShrink e HardShrink (queste ultime con $\lambda=1$). La linea tratteggiata $y=x$ è mostrata come riferimento.}
+\end{figure}
 \end{itemize}
 
 \section{Funzioni Probabilistiche}
-Fino ad ora, abbiamo analizzato funzioni di attivazione che operano in modo scalare, ovvero trasformano l'output di ogni singolo neurone indipendentemente dagli altri. Esiste, tuttavia, una classe di funzioni che opera a livello vettoriale, trasformando un intero vettore di output in una distribuzione di probabilità. Queste funzioni sono fondamentali nello strato di output dei modelli di classificazione multiclasse, dove l'obiettivo non è semplicemente ottenere un punteggio per ogni classe, ma interpretare questi punteggi come la probabilità che l'input appartenga a ciascuna di esse. Convertendo i valori grezzi del modello (logits) in probabilità, possiamo non solo selezionare la classe più probabile, ma anche quantificare la fiducia del modello nella sua previsione.
+Fino ad ora, abbiamo analizzato funzioni di attivazione che operano in modo scalare, trasformando l'output di ogni neurone indipendentemente dagli altri. Esiste, tuttavia, una classe di funzioni che opera a livello vettoriale, trasformando un intero vettore di output in una distribuzione di probabilità. Queste funzioni sono fondamentali nello strato di output dei modelli di classificazione multiclasse, dove l'obiettivo non è semplicemente ottenere un punteggio per ogni classe, ma interpretare questi punteggi come la probabilità che l'input appartenga a ciascuna di esse. Convertendo i valori grezzi del modello (logits) in probabilità, possiamo non solo selezionare la classe più probabile, ma anche quantificarne la fiducia del modello nei confronti della sua previsione.
 
 \begin{itemize}
     \item \textbf{Softmax:} questa funzione di attivazione trasforma un vettore in una distribuzione di probabilità all'interno di un range, essa inoltre enfatizza le differenze assegnando a valori più grandi una probabilità più alta, mentre quelli piccoli vengono schiacciati vicino allo zero, la somma di tutti i valori è pari a 1 amplificando la differenza fra i valori scalandoli a elementi dopo la virgola;
-    \begin{equation}
+    \[
         \operatorname{Softmax}(x_i) = \frac{e^{x_i}}{\sum_je^{x_j}}
-    \end{equation}
+    \]
     \item \textbf{Softmin:} la differenza rispetto alla Softmax è l'utilizzo del segno meno all'esponente, dunque una semplice inversione. Questo fa sì che valori più piccoli abbiano una probabilità maggiore, mentre i valori più grandi abbiano probabilità più piccole, essa inoltre è simmetrica rispetto al softmax;
-    \begin{equation}
+    \[
         \operatorname{Softmin}(x_i) = \frac{e^{-x_i}}{\sum_je^{-x_j}}
-    \end{equation}
+    \]
     \item \textbf{LogSoftmax:} quest'altra tipologia di funzione di attivazione invece è una variante della Softmax, in cui si applica il logaritmo alla funzione Softmax per migliorare la stabilità numerica e semplificare il calcolo della perdita nelle reti neurali.
-    \begin{equation}
+    \[
         \operatorname{LogSoftmax}(x_i) =\log( \frac{e^{x_i}}{\sum_je^{x_j}})
-    \end{equation}
+    \]
 \end{itemize}
 
 \begin{Osservazione}
-    La funzione Softmax può essere vista come la generalizzazione della funzione Sigmoide dal caso binario al caso multiclasse. In altre parole, la Sigmoide è un caso speciale di Softmax quando le classi da predire sono solo due ($K=2$).
+    La funzione Softmax può essere vista come la generalizzazione della funzione Sigmoide dal caso binario al caso multiclasse. In altre parole, la Sigmoide è un caso speciale di Softmax quando le classi da predire sono solo due ($K=2$), e il valore del secondo elemento è pari a zero.
 \end{Osservazione}
+
+\[
+    z_i = \frac{\operatorname{exp}(x_i)}{\sum_j x_j} \Rightarrow\,z_1=\frac{e^{x_1}}{e^{x_1}+e^{x_2}} \Rightarrow x_2=0 \Rightarrow z_1 = \frac{x_1}{e^{x_1}+1} \Rightarrow\frac{1}{1+e^{-x_1}}
+\]

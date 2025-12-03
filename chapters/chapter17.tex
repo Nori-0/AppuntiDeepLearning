@@ -1,23 +1,28 @@
 \chapter{Energy-Based Models (EBM)}
 
-Gli \textbf{Energy-Based Models} (EBM) costituiscono un paradigma di modellazione che si distacca dai classici approcci discriminativi o generativi che conosciamo. Invece di apprendere direttamente una funzione esplicita di predizione normalizzata, un \textbf{EBM} definisce un'\textit{energia} associata a ogni configurazione possibile di input $x$ e output $y$, misurandone la compatibilità. Questa energia viene definita tramite una funzione scalare $E(x, y)$, il quale obbiettivo è minimizzarla, definito come \textit{obbiettivo inferenziale}. Gli \textbf{Energy Based Model}, si articolano principalmente in due fasi, quella di allenamento, solitamente molto costosa e quella di inferenza. 
+Gli \textbf{Energy-Based Models} (EBM) costituiscono un paradigma di modellazione che si distacca dagli approcci discriminativi o generativi classici. Invece di apprendere direttamente una funzione esplicita di predizione normalizzata, un \textbf{EBM} definisce un'\textit{energia} associata a ogni configurazione possibile di input $x$ e output $y$, misurandone la compatibilità. Questa energia viene definita tramite una funzione scalare $E(x, y)$, il cui obbiettivo è minimizzarla, definito come \textit{obbiettivo inferenziale}. Gli \textbf{Energy Based Model}, si articolano principalmente in due fasi: quella di \textbf{allenamento} (o training), solitamente molto costosa, e quella di \textbf{inferenza}. 
+
+
 
 \section{Training}
-Nella prima fase, il modello impara la funzione d'energia tramite l'uso di un input e di un'etichetta di riferimento, l’idea chiave è definire un’energia associata a ogni configurazione possibile degli input, dove le configurazioni "plausibili" hanno energia bassa mentre le configurazioni "implausibili" hanno energia alta. Allenare un EBM richiede minimizzare un loss che coinvolge questa energia, spesso confrontando l’energia di esempi reali con quella di esempi generati.
+Nella fase di allenamento, il modello impara la funzione d'energia tramite l'uso di un input e di un'etichetta di riferimento. L’idea chiave è che le configurazioni "Plausibili" abbiano bassa energia, mentre le configurazioni "implausibili" abbiano alta energia. Effettuare il training di un EBM richiede la minimizzazione di una funzione di costo che coinvolge questa energia, spesso confrontando l’energia di esempi reali (positivi) con quella di esempi generati (negativi).
+
 \section{Inferenza}
-Una volta che il modello è stato allenato, possiamo usarlo per fare inferenza, ossia determinare quale output y (o quale input x) minimizza l’energia, in altre parole, trovare la configurazione più probabile secondo il modello. Ad esempio, in un EBM discriminativo $E(x,y)$, possiamo usare il modello per inferire l’etichetta $y$ più probabile per un dato $x$:
+Una volta che il modello è stato allenato, possiamo usarlo per l'inferenza, ossia determinare quale output $y$ (o quale input $x$) minimizza l’energia, in altre parole, trovare la configurazione più probabile secondo il modello. Ad esempio, in un EBM discriminativo $E(x,y)$, possiamo usare il modello per inferire l’etichetta $\hat{y}$ più probabile per un dato $x$:
 
 \begin{equation}
     \hat{y} = \arg\min_y E(x, y)
 \end{equation}
-In molti casi pratici il modello EBM è già allenato da qualcun altro, e noi lo usiamo solo per inferneza, cioè non modifichiamo i pesi, ma utiliziamo il modello per selezionare le configurazioni a bassa energia, ad esempio:
+
+In molti casi pratici il modello EBM è già allenato da qualcun altro, e viene utilizzato solo per l'inferneza (non vengono modificati i pesi) per selezionare le configurazioni a bassa energia. Alcuni esempi includono:
 \begin{itemize}
     \item Trovare la label più probabile per un'immagine;
     \item Campionare un'immagine simile a un target;
     \item Scegliere tra alternative quella più compatibile con un certo contesto.
 \end{itemize}
 
-Il fenomeno dell'inferenza viene solitamente visualizzato tramite un'interpretazione grafica visibile in Figura~\ref{fig:InfGoodBad}. Se la superficie è piatta, l'allenamento non è stato fatto in maniera corretta, poiché non identificherà delle differenze nelle varie zone. Se invece la superficie risulta essere ricurva, è stato allenato bene, distinguendo varie zone in base alla loro energia. Il passo successivo sarà semplicemente quello di trovare i valori precisi che generano il minimo.
+Il fenomeno dell'inferenza viene solitamente visualizzato tramite un'interpretazione grafica della superficie energetica (Figura~\ref{fig:InfGoodBad}). Se la superficie è piatta, l'allenamento non è stato corretto, poiché non identificherà delle differenze significative tra le varie zone. Se invece la superficie risulta essere ricurva (con minimi ben definiti), il modello sarà stato allenato bene, distinguendo le zone a bassa energia da quelle ad alta. Il passo successivo sarà quello di trovare i valori precisi che generano il minimo.
+
 \begin{figure}
     \centering
     \includegraphics[width=0.7\textwidth]{figure/InferenceGoodBad.png}
@@ -28,14 +33,14 @@ Il fenomeno dell'inferenza viene solitamente visualizzato tramite un'interpretaz
 \subsection{Quando usare un EBM}
 I casi d'uso degli EBM includono:
 \begin{itemize}
-    \item Problemi che richiedono calcoli complessi per determinare l'output;
-    \item Situazioni con uscite multiple plausibili;
+    \item Problemi che richiedono calcoli complessi per determinare l'output (e.g modelli con molteplici variabili accoppiate);
+    \item Situazioni con uscite multiple plausibili (problemi multimodali o one-to-many);
     \item Inferenza come soddisfacimento di vincoli, tipico di traduzioni linguisticamente corrette o trascrizioni fonetiche coerenti.
 \end{itemize}
 
 \section{Modelli espliciti vs impliciti}
 
-Un modello feed-forward classico è una funzione esplicita $y = f(x)$, dunque calcola $y$ a partire da $x$, mentre un EBM definisce una relazione \textit{implicita} tra $x$ e $y$ tramite la funzione energetica $E(x, y)$. L'inferenza consiste nel risolvere l'ottimizzazione rispetto a $y$. Questo consente l'esistenza di molteplici $y$ compatibili con uno stesso $x$, rendendo l'approccio adatto per compiti multimodali, se $y$ è continuo, è essenziale che $E$ sia differenziabile e liscia, per consentire l'uso di algoritmi di ottimizzazione basati sul gradiente.
+Un modello \textit{feed-forward} classico è una funzione \textbf{esplicita} $y = f(x)$, che calcola direttamente $y$ a partire da $x$. Al contrario, un EBM definisce una relazione \textbf{implicita} tra $x$ e $y$ tramite la funzione energetica $E(x, y)$. L'inferenza consiste nel risolvere il problema di ottimizzazione ($\arg\min_yE(x,y)$). Questo approccio implicito consente l'esistenza di molteplici $y$ compatibili con uno stesso $x$, rendendo l'approccio adatto per compiti \textbf{multimodali}. Se $y$ è continuo, è essenziale che $E$ sia \textit{differenziabile} e \textit{liscia}, per consentire l'uso di algoritmi di ottimizzazione basati sul gradiente.
 
 \begin{figure}
     \centering
@@ -46,32 +51,32 @@ Un modello feed-forward classico è una funzione esplicita $y = f(x)$, dunque ca
 
 \section{EBM per predizione multimodale}
 
-Due degli approcci più utilizzati, ma diversi fra loro che estendono il paradigma classico degli EBMs, sfruttati in ambiti come multimodalità e modellazione generativa profonda, sono i seguenti:
+Due degli approcci più utilizzati che estendono il paradigma classico degli EBM, sfruttati in ambiti come multimodalità e modellazione generativa profonda, sono:
 
 \begin{itemize}
     \item \textbf{Joint Embedding Architectures:} basate sulla distanza nello spazio delle feature;
-    \item \textbf{Latent Variable Models:} introducono variabili latenti per rappresentare fattori di variazione non osservati.
+    \item \textbf{Latent Variable Models:} introducono variabili latenti $z$ per rappresentare fattori di variazione non osservati.
 \end{itemize}
 
 \subsection{Joint Embedding}
 
-In un \textbf{Joint Embedding} EBM, si definisce una funzione di energia sullo spazio latente condiviso tra input e output, tipicamente tramite embedding. È utilizzato in modelli contrastivi e multimodali, algoritmi noti includono Siamese Networks e tecniche di metric learning~\cite{bromley1993signature, chopra2005learning, hadsell2006dimensionality}. Il vantaggio principale è l'assenza di necessità di ricostruzione a livello di pixel. Considerando $x$ come un'immagine di input e $y$ come output testuale e $f(x)$ e $g(y)$ due reti neurali, esse proiettano $x$ e $y$ in uno spazio comune nella seguente maniera:
+In un \textbf{Joint Embedding} EBM, la funzione di energia è definita sullo spazio latente condiviso tra input e output, tipicamente tramite embedding. È l'approccio alla base dei modelli contrastivi e multimodali. Algoritmi noti includono \textit{Siamese Networks} e tecniche di \textit{Metric Learning}~\cite{bromley1993signature, chopra2005learning, hadsell2006dimensionality}. Il vantaggio principale è l'assenza di necessità di ricostruzione a livello di pixel. Considerando $x$ come un'immagine di input e $y$ come output testuale e $f(x)$ e $g(y)$ due reti neurali, esse proiettano $x$ e $y$ in uno spazio comune l'energia può essere definita come:
 
 \begin{equation}
     E(x,y) = - \langle f(x)\,,\,g(y)\rangle
 \end{equation}
 
-L'energia pertanto viene ottenuta come il prodotto scalare o cosine similarity delle due reti, l'energia risulterà di basso valore se $x$ e $y$ risultassero compatibili fra loro, fornendo una forte similarità. Esempi reali di applicazione includono:
+L'energia pertanto viene ottenuta come il valore negativo del prodotto scalare (o cosine similarity) dei due embedding. L'energia risulterà di basso valore se $x$ e $y$ sono compatibili, indicando una forte similarità nello spazio latente. Esempi applicativi includono:
 \begin{itemize}
     \item DeepFace~\cite{taigman2014deepface};
     \item PIRL~\cite{misra2019pirl}, MoCo~\cite{he2019moco};
     \item SimCLR~\cite{chen2020simclr}.
 \end{itemize}
 
-L'obbiettivo finale è ovviamente quello di minimizzare l'energia e dunque massimizzare la similarità per le coppie vere, mentre massimizzare l'energia e minimizzare la similarità per le coppie false.
+L'obbiettivo è \textit{minimizzare} l'energia (massimizzare la similarità) per le coppie vere (positive) e \textbf{massimizzare} l'energia (minimizzare la similarità) per le coppie false (negative).
 
 \subsection{Latent Variable EBMs}
-In questa tipoliga di modello vengono sfruttate le variabili latenti $z$, le quali parametrizzano lo spazio delle predizioni. Idealmente rappresentano dei fattori indipendenti, tuttavia la loro capacità informativa deve essere minimizzata in modo tale da evitare che tutta l'informazione della predizione passi da $z$, ma venga solo influenzata parzialmente da essa.
+In questa tipoliga di modello vengono sfruttate le variabili latenti $z$, le quali parametrizzano lo spazio delle predizioni. Idealmente, $z$ rappresenta fattori indipendenti non direttamente osservabili. Per evitare che la variabile latente $z$ prenda il soppravvento sull'informazione di input e porti a una superficie energetica piatta, la sua capacità informativa deve essere \textit{minimizzata} (regolarizzata), in modo da influenzare solo parzialmente la predizione.
 
 \begin{figure}
     \centering
@@ -80,34 +85,35 @@ In questa tipoliga di modello vengono sfruttate le variabili latenti $z$, le qua
     Nel primo caso, la funzione di energia $E(W, Y, X)$ valuta direttamente la compatibilità tra l'immagine $X$ e l'etichetta binaria $Y$. Nel secondo caso, viene introdotta una variabile latente $Z$ che rappresenta la posizione del volto, e il modello calcola l'energia congiunta $E(W, Z, Y, X)$. Questo consente al modello di apprendere rappresentazioni strutturate e di migliorare la localizzazione e classificazione del volto all'interno dell'immagine.}
     \label{fig:ebm-face}
 \end{figure}
-
-Alcuni esempi applicativi di questa tipologia di modello si riversano nella lettura di parole scritte a mano, permettendo di sapere dove iniziano e finiscono i caratteri di una parola, ma anche nella comprensione del parlato, riuscendo a segmentare in fonemi o parole all'interno di un discorso.
+Esempi applicativi si riscontrano nella lettura di parole scritte a mano (segmentazione dei caratteri) e nella comprensione del parlato (segmentazione in fonemi o parole).
 
 \subsection{EBM con variabili latenti condizionali}
-Come abbiamo detto precedentemnte nel modello con variabili latenti, vi è il rischio che la variabile latente prenda il soppravvento sulle informazioni fornite in input, pertanto è utile introdurre un regolarizzatore $R(z)$ che limiti la capacità informativa di $z$. Altrimenti, ogni $y$ potrebbe essere ricostruito perfettamente, risultando in una superficie energetica piatta. Alcuni approcci includono:
+
+Per limitare la capacità informativa di $z$ e prevenire l'appiattimento della superficie energetica, è fondamentale introdurre un regolarizzatore $R(z)$. Altrimenti, ogni $y$ potrebbe essere ricostruito perfettamente, rendendo $E(x,y)$ non informativo. Alcuni approcci di regolarizzazione includono:
+
 \begin{itemize}
-    \item Quantizzazione/discretizzazione;
-    \item Penalizzazioni tipo L0, L1;
+    \item Quantizzazione/discretizzazione dello spazio di $z$;
+    \item Penalizzazioni tipo $L_0$, $L_1$;
     \item Inibizione laterale;
-    \item Aggiunta di rumore controllato.
+    \item Aggiunta di rumore controllato alla variabile latente.
 \end{itemize}
 
 \section{Training degli Energy-Based Models}
 
-L’addestramento di un \textbf{Energy-Based Model} (EBM) consiste nel parametrizzare una funzione di energia $F(x, y; \theta)$ in modo che a ogni coppia di input $(x, y)$ venga associato un valore di energia. L’obiettivo è che le coppie corrette (quelle osservate nei dati) abbiano energia più bassa rispetto a tutte le altre combinazioni possibili:
+L’addestramento di un \textbf{Energy-Based Model} (EBM) consiste nel parametrizzare una funzione di energia $E(x, y; \theta)$ in modo che le coppie corrette (quelle osservate nei dati) abbiano energia più bassa rispetto a tutte le altre combinazioni possibili:
 \begin{equation}
-    F(x^{(i)}, y^{(i)}) < F(x^{(i)}, y), \quad \forall y \neq y^{(i)}
+    E(x^{(i)}, y^{(i)}) < E(x^{(i)}, y), \quad \forall y \neq y^{(i)}
 \end{equation}
 In questo modo, il modello impara una funzione energetica che distingue correttamente le coppie plausibili da quelle implausibili.
 \subsection{Due approcci principali}
 L’addestramento di un EBM può essere condotto secondo due famiglie principali di metodi:
 \begin{enumerate}
-    \item \textbf{Metodi contrastivi:} minimizzano l’energia associata alle coppie corrette e la massimizzano per le coppie errate. Esempi includono la \textit{Contrastive Divergence} e le \textit{margin-based loss};
-    \item \textbf{Metodi con regolarizzazione o architetturali:} invece di modellare esplicitamente coppie negative, questi metodi impongono vincoli sulla forma di $F$ o penalizzano regioni troppo ampie a bassa energia, garantendo una funzione più liscia e generalizzabile.
+    \item \textbf{Metodi contrastivi:} minimizzano l’energia associata alle coppie corrette e la massimizzano per le coppie errate (e.g \textit{Contrastive Divergence} e \textit{Margin-Based Loss});
+    \item \textbf{Metodi con Regolarizzazione o Architetturali:} impongono vincoli sulla forma di $E$ o penalizzano regioni troppo ampie a bassa energia, evitando di modellare esplicitamente coppie negative e garantendo una funzione più liscia e generalizzabile.
 \end{enumerate}
 
 \subsection{Problemi con il massimo di verosimiglianza}
-L’approccio probabilistico tradizionale agli EBM mira a modellare la distribuzione dei dati tramite la massimizzazione della verosimiglianza. Tuttavia, questo equivale a creare un “canyon” infinitamente stretto e profondo attorno alla distribuzione dei dati osservati. Un tale scenario porta a due problematiche principali:
+L’approccio probabilistico tradizionale agli EBM mira a modellare la distribuzione dei dati tramite la massimizzazione della verosimiglianza. Tuttavia, questo equivale a creare un \textit{"canyon"} infinitamente stretto e profondo attorno alla distribuzione dei dati osservati. Questo porta a due problematiche principali:
 \begin{itemize}
     \item La funzione energetica diventa troppo \textbf{non liscia}, rendendo difficile la discesa del gradiente;
     \item Il modello tende a \textbf{overfittare}, concentrandosi eccessivamente sui dati osservati.
@@ -118,70 +124,61 @@ Per questo motivo, spesso si preferiscono approcci \textbf{regolarizzati o contr
 \subsection{Distribuzione di Gibbs}
 In un’ottica probabilistica, la funzione di energia può essere interpretata come il negativo del logaritmo di una distribuzione non normalizzata:
 \begin{equation*}
-    P(y|x) \propto e^{-\beta F(x, y)}.
+    P(y|x) \propto e^{-\beta E(x, y)}.
 \end{equation*}
 dove:
 \begin{itemize}
     \item $\beta$ è un parametro di scala chiamato \textit{Inverse Temperature};
-    \item $F(x,y)$ è l'energia associata alla coppia $(x,y)$;
+    \item $E(x,y)$ è l'energia associata alla coppia $(x,y)$;
 \end{itemize}
 
 Il termine di normalizzazione (partizione di Gibbs) è dato da:
 
 \begin{equation}
-    Z(x)=\int_{y'}e^{-\beta\,F(x,y')}dy'
+    Z(x)=\int_{y'}e^{-\beta\,E(x,y')}dy'
 \end{equation}
+Tuttavia, $Z(x)$ è notoriamente \textbf{molto costoso} da calcolare, poiché richiede di integrare su tutte le possibili $y'$. Per questo, nella pratica, si evita di stimare $P(y|x)$ in forma esplicita, e si preferiscono strategie di ottimizzazione basate su confronti di energia.
+\section{Metodi Contrastivi}
 
-che però risulta essere molto costoso da calcolare, poiché richiede di sommare (o integrare) su tutte le possibili $y'$.
-Per questo, nella pratica si evita di stimare $P(y|x)$ in forma esplicita, e si preferiscono strategie di ottimizzazione basate su confronti di energia.
-\section{Contrastive Methods}
-
-I \textbf{metodi contrastivi} addestrano il modello riducendo l’energia per le coppie corrette e aumentandola per tutte le altre.
-In termini probabilistici, si può scrivere:
+I \textbf{metodi contrastivi} addestrano il modello riducendo l’energia per le coppie corrette (positive) e aumentandola per tutte le altre (negative). In termini probabilistici, si può scrivere la probabilità come:
 
 \begin{equation}
-    P(Y\,|\,W)= -\frac{e^{-\beta\,E(Y,W)}}{\int_{y'}e^{-\beta\,E(y,W)}}
+    P(y\,|\,x)= -\frac{e^{-\beta\,E(x,y; \theta)}}{\int_{y'}e^{-\beta\,E(x,y';\theta)}dy'}
 \end{equation}
-e la funzione di perdita corrispondente è:
+e la funzione di perdita (log-verosimiglianza negativa) corrispondente è:
 \begin{equation}
-    L(Y,W) = E(Y,W) + \frac{1}{\beta}\,\log\int_ye^{-\beta\,E(y,W)}dy'
+    L(x,y; \theta) = E(x,y; \theta) + \frac{1}{\beta}\,\log\int_{y'}e^{-\beta\,E(x,y;\theta)}dy'
 \end{equation}
-
-La prima parte riduce l’energia dei campioni corretti, mentre la seconda penalizza il modello se assegna energia bassa anche ad altre configurazioni.
+La prima parte riduce l'energia dei campioni corretti, mentre il secondo termine (che include il logaritmo della funzione di partizione $Z(x)$) penalizza il modello se assegna energia bassa anche ad altre configurazioni non corrette.
 
 \subsection{Esempi di contrastive training}
 \begin{itemize}
-    \item \textbf{Contrastive Divergence (CD):} si utilizza un set di campioni reali e un set di campioni “negativi” generati tramite catene di Markov (MCMC).
-    \item \textbf{Loss a margine:} funzioni come la \textit{Square-Square loss} o la \textit{negative log-likelihood} introducono un margine esplicito tra energia positiva e negativa.
-    \item \textbf{Embedding contrastivo:} nello spazio delle feature, i campioni positivi vengono spinti vicini e quelli negativi allontanati.
+    \item \textbf{Contrastive Divergence (CD):} si utilizza un set di campioni reali e un set di campioni "negativi" generati tramite catene di Markov (MCMC);
+    \item \textbf{Loss a margine:} funzioni come la \textit{Square-Square loss} o la \textit{Negative Log-Likelihood} introducono un margine esplicito tra energia positiva e negativa;
+    \item \textbf{Embedding contrastivo:} nello spazio delle \textit{feature}, i campioni positivi vengono spinti vicini e quelli negativi allontanati.
 \end{itemize}
 
 \section{Embedding non contrastivo}
 
-Gli \textbf{embedding non contrastivi} superano la necessità di generare "esempi negativi" o di effettuare \textit{negative mining}.
-Essi utilizzano due reti quasi identiche (una principale e una "target") con pesi lievemente diversi, aggiornati con strategie lente o mediate.Esempi noti:
+Gli \textbf{embedding non contrastivi} superano la necessità di generare "esempi negativi" o di effettuare \textit{negative mining}, sfruttando due reti quasi identiche (\textit{online} e \textit{target}) con pesi aggiornati con strategie lente o mediate. Esempi noti:
 \begin{itemize}
     \item \textbf{SimSiam}~\cite{chen2021simsiam};
     \item \textbf{BYOL} (\textit{Bootstrap Your Own Latent}).
 \end{itemize}
-
-Questi metodi si basano sull’idea che un modello possa auto-supervisionarsi, imparando rappresentazioni coerenti da due viste diverse dello stesso campione, anche senza etichette o esempi negativi espliciti. Non trattiamo questi esempi, poiché porterebbero a un livello di dettaglio ulteriore, il quale porterebbe ad andare al di fuori delle competenze richieste dal corso, tuttavia possono essere approfonditi attraverso la lettura dei paper citati.
+Questi metodi si basano sull'idea di \textit{auto-supervisione}, imparando rappresentazioni coerenti da due diverse \textit{viste} dello stesso campione, anche senza etichette o esempi negativi espliciti.
 
 \section{Self-Supervised Learning (SSL)}
-Il \textbf{Self-Supervised Learning} nasce dall’osservazione del modo in cui gli esseri umani, da bambini, apprendono: esplorando l’ambiente e costruendo internamente rappresentazioni del mondo a partire da osservazioni parziali. Un modello SSL impara a:
+Il \textbf{Self-Supervised Learning} (SSL) nasce dall’osservazione del modo in cui gli esseri umani apprendono, esplorando l’ambiente e costruendo internamente rappresentazioni del mondo a partire da osservazioni parziali. Un modello SSL impara a:
 \begin{itemize}
-    \item Predire parti mancanti o corrotte dell’input a partire dalle parti osservate;
+    \item Predire parti mancanti o corrotte dell’input a partire dalle parti osservate (e.g inpainting);
     \item Ricostruire dati incompleti o rumorosi;
     \item Comprendere relazioni temporali o spaziali implicite.
 \end{itemize}
-
-In altre parole, l’obiettivo è imparare una rappresentazione utile del mondo senza etichette, sfruttando solo la struttura dei dati.
+L'obiettivo è imparare una rappresentazione utile del mondo senza etichette, sfruttando solo la struttura intrinseca dei dati stessi.
 
 \subsection{Applicazioni di SSL}
-Esempi moderni di apprendimento self-supervised includono:
+Esempi moderni di apprendimento \textit{self-supervised} includono:
 \begin{itemize}
-    \item \textbf{Wav2Vec 2.0:} addestrato su 960 ore di parlato non etichettato, ottiene prestazioni simili a modelli supervisionati che richiedono 100 volte più dati etichettati;
-    \item \textbf{BERT} e \textbf{GPT}: basati sulla predizione di token mascherati o successivi, hanno rivoluzionato il NLP mostrando come la predizione contestuale possa generare rappresentazioni linguistiche estremamente potenti.
+    \item \textbf{Wav2Vec 2.0:} addestrato su 960 ore di parlato non etichettato, ha raggiunto prestazioni competitive con modelli che richiedono molta più supervisione esplicita;
+    \item \textbf{BERT} e \textbf{GPT}: basati sulla predizione di token mascherati o successivi (task di auto-supervisione), hanno rivoluzionato il NLP generando rappresentazioni linguistiche estremamente potenti.
 \end{itemize}
-
-Le performance su benchmark come RACE dimostrano che i modelli SSL possono raggiungere accuratezze tra il 45\% e il 90\%, pur essendo addestrati senza supervisione esplicita.

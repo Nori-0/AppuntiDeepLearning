@@ -1,6 +1,6 @@
 \chapter{Diffusion Models}\label{cap:15}
 
-In questo capitolo affrontiamo una tematica profondamente diversa da quanto visto finora: l’utilizzo dei modelli di Deep Learning per la generazione di immagini. In precedenza, abbiamo esplorato l'approccio delle \textbf{Generative Adversarial Networks} (GAN), in cui si apprende direttamente la distribuzione di probabilità da cui si generano nuovi dati. Concentriamoci su una nuova metodologia: i \textbf{Modelli di Diffusione}, accanto a questi modelli, è importante segnalare l’emergere di una nuova famiglia di modelli generativi sviluppati nel 2024, i quali non verranno trattati in questi appunti. I modelli di diffusione si fondano su un'intuizione tanto semplice quanto potente: corrompere progressivamente un dato, aggiungendo rumore, fino a trasformarlo in rumore puro, per poi addestrare un modello per compiere il processo inverso, rimuovere gradualmente il rumore per recuperare l’immagine originale (Figura~\ref{fig:diffMod}). L’ispirazione teorica proviene dalla termodinamica, in cui i processi stocastici descrivono il passaggio da uno stato ordinato a uno disordinato e viceversa.
+In questo capitolo affrontiamo una tematica profondamente diversa da quanto visto finora: l’utilizzo dei modelli di Deep Learning per la generazione di immagini. In precedenza, abbiamo esplorato l'approccio delle \textbf{Generative Adversarial Networks} (GAN), in cui si apprende direttamente la distribuzione di probabilità da cui si generano nuovi dati. Concentriamoci su una nuova metodologia: i \textbf{Modelli di Diffusione}. I modelli di diffusione si fondano su un'intuizione tanto semplice quanto potente: corrompere progressivamente un dato, aggiungendo rumore, fino a trasformarlo in rumore puro, per poi addestrare un modello per compiere il processo inverso, rimuovere gradualmente il rumore, a partire da un rumore casuale l’immagine che mi aspetto di ottenere (Figura~\ref{fig:diffMod}). L’ispirazione teorica proviene dalla termodinamica, in cui i processi stocastici descrivono il passaggio da uno stato ordinato a uno disordinato e viceversa.
 \begin{figure}[hbtp]
     \centering
     \includegraphics[width=\textwidth]{figure/diffusionModel}
@@ -9,7 +9,7 @@ In questo capitolo affrontiamo una tematica profondamente diversa da quanto vist
 \end{figure}
 
 \section{Stable Diffusion}
-Una delle implementazioni più celebri ed efficienti di questa famiglia è \textbf{Stable Diffusion}. La sua innovazione principale consiste nel non applicare la diffusione direttamente sui pixel, ma su uno \textbf{spazio latente compresso}. Questo spazio, ottenuto tramite un Autoencoder, rappresenta le informazioni essenziali dell’immagine in una forma compatta e gestibile.
+Una delle implementazioni più celebri ed efficienti di questa famiglia è \textbf{Stable Diffusion}. La sua innovazione principale consiste nel non applicare la diffusione direttamente sui pixel, ma utilizzando uno \textbf{Spazio Latente Compresso}. Questo spazio, ottenuto tramite un Autoencoder, rappresenta le informazioni essenziali dell’immagine in una forma compatta e gestibile.
 
 \begin{itemize}
     \item Il modello lavora con vettori di dimensioni molto più piccole rispetto ai pixel originali;
@@ -24,13 +24,13 @@ Questa strategia ricorda quanto visto nei \textbf{Variational Autoencoder (VAE)}
 Stable Diffusion consente di affrontare diversi compiti di generazione, chiamati \textit{task}, tra cui:
 \begin{itemize}
     \item \textbf{\texttt{text2img}:} generazione di immagini a partire da un prompt testuale;
-    \item \textbf{\texttt{text+image}:} generazione o modifica di immagini a partire da un’immagine parziale e un prompt testuale.
+    \item \textbf{\texttt{text+image}:} generazione o modifica di immagini a partire da un’immagine e un prompt testuale.
 \end{itemize}
 
 In entrambi i casi, il modello è composto da tre moduli principali:
 \begin{enumerate}
-    \item \textbf{Text Encoder:} converte il testo del prompt in un embedding numerico (tramite il modello CLIP);;
-    \item \textbf{Image Information Creator:} una rete U-Net che, insieme a uno scheduler, effettua il processo di denoising nello spazio latente;;
+    \item \textbf{Text Encoder:} converte il testo del prompt in un embedding numerico (tramite il modello CLIP);
+    \item \textbf{Image Information Creator:} una rete U-Net che, insieme a uno scheduler, effettua il processo di denoising nello spazio latente;
     \item \textbf{Image Decoder:} un Autoencoder che ricostruisce l’immagine finale dallo spazio latente.
 \end{enumerate}
 
@@ -61,8 +61,11 @@ Il processo inverso è il cuore dei modelli di diffusione. Per ricostruire un’
     \item Si corrompe l'immagine originale sommando il rumore;
     \item Si addestra la rete a predirre il rumore aggiunto.
 \end{enumerate}
-Durante la generazione (\textit{Denoising}), si parte da puro rumore e si sottrae, a ogni step, la stima del rumore fornita dal modello. Iterando il processo decine o centinaia di volte, il rumore scompare gradualmente, rivelando un’immagine coerente con quanto aspettato (Figura~\ref{fig:revDiff}).
 
+\begin{Osservazione}
+    Per rendere il Training meno costoso, si possono utilizzare le stesse immagini con diverse quantità di rumore, così da poter avere un dataset più ampio, su cui allenare in Noise Predictor, a partire da poche immagini.
+\end{Osservazione}
+Durante la generazione (\textit{Denoising}), si parte da puro rumore e si sottrae, a ogni step, la stima del rumore fornita dal modello. Iterando il processo decine o centinaia di volte, il rumore scompare gradualmente, rivelando un’immagine coerente con quanto aspettato (Figura~\ref{fig:revDiff}).
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{figure/ReverseDiffusion.png}
@@ -73,7 +76,7 @@ Senza alcun vincolo esterno, questo processo è detto \textbf{incondizionato}, p
 
 \section{Conditioning}
 
-Per generare immagini coerenti con un prompt testuale, è necessario introdurre un meccanismo di \textbf{condizionamento} (\textit{conditioning}). In pratica, il modello non parte più solo dal rumore, ma riceve anche un’informazione aggiuntiva (il testo) che guida il processo di generazione. Il prompt viene elaborato da un \textbf{Text Encoder}, che produce un embedding vettoriale. Questo embedding viene poi integrato nella U-Net attraverso un meccanismo di \textbf{Cross-Attention}, consentendo al modello di generare contenuti visivi coerenti con la descrizione testuale.
+Per generare immagini coerenti con un prompt testuale, è necessario introdurre un meccanismo di \textbf{Condizionamento} (\textit{conditioning}). In pratica, il modello non parte più solo dal rumore, ma riceve anche un’informazione aggiuntiva (il testo) che guida il processo di generazione. Il prompt viene elaborato da un \textbf{Text Encoder}, che produce un embedding vettoriale. Questo embedding viene poi integrato nella U-Net attraverso un meccanismo di \textbf{Cross-Attention}, consentendo al modello di generare contenuti visivi coerenti con la descrizione testuale.
 
 \subsection{Cross-Attention}
 Il meccanismo di \textbf{Cross-Attention} permette a una sequenza di essere "guidata" da un’altra. A differenza della \textit{Self-Attention}, dove una sequenza interagisce con sé stessa, qui l’interazione avviene tra due sequenze distinte (ad esempio, testo e immagine latente). Nel caso di Stable Diffusion:
@@ -98,27 +101,12 @@ Nel contesto dei Transformer, la Cross-Attention combina due sequenze: una da cu
     \label{fig:crossTrasf}
 \end{figure}
 
-\subsubsection{Algoritmo della Cross-Attention}
-
-\begin{enumerate}
-    \item Ottenere due sequenze $S_1$ (per Key e Value) e $S_2$ (per Query);
-    \item Calcolare $K, V$ da $S_1$;
-    \item Calcolare $Q$ da $S_2$;
-    \item Calcolare la matrice di attenzione da $Q$ e $K$;
-    \item Applicare la matrice di attenzione ai $V$;
-    \item L’output ha dimensione pari a $S_2$.
-\end{enumerate}
-
 \begin{figure}
     \centering
     \includegraphics[width=0.6\textwidth]{figure/StableDiffusionArchitecture.png}
     \caption{Architettura completa della Stable Diffusion.}
     \label{fig:StabDiffArch}
 \end{figure}
-
-\subsubsection{Cross-Attention nel Perceiver IO}
-
-Il \textbf{Perceiver IO} è un'architettura multimodale in grado di gestire input e output eterogenei. Utilizza la Cross-Attention per mescolare input multimodali in una rappresentazione latente compatta, permettendo poi la generazione di output flessibili e controllabili.
 
 \section{Ulteriori forme di Conditioning}
 Il testo non è l’unico modo per guidare la generazione. Stable Diffusion e i suoi derivati permettono anche di condizionare il processo su altre informazioni, come bordi, profondità o pose. Queste varianti consentono un controllo più preciso e mirato sull’immagine generata.
@@ -179,7 +167,7 @@ dove:
     \item $\sigma_t$ è la deviazione standard del rumore al passo $t$.
 \end{itemize}
 
-Aumentando $s$, il modello viene "spinto" più fortemente verso immagini che il classificatore considera coerenti con la condizione desiderata, ma se $s$ è troppo alto si rischia di perdere diversità o introdurre artefatti visivi.
+Aumentando $s$, il modello viene "spinto" maggiormente verso immagini che il classificatore considera coerenti con la condizione desiderata, ma se $s$ è troppo alto si rischia di perdere diversità o introdurre artefatti visivi.
 
 \subsection{Classifier-Free Guidance (CFG)}
 Sebbene efficace, il Classifier Guidance richiede un classificatore esterno, addestrato separatamente. Questo rende l’approccio più complesso e meno flessibile. Per semplificare, nasce il \textbf{Classifier-Free Guidance (CFG)}, oggi utilizzato in modelli come Stable Diffusion, Imagen e DALL-E 3.

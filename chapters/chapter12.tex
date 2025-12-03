@@ -1,6 +1,6 @@
 \chapter{Autoencoder}
 
-Un \textbf{Autoencoder} è una rete neurale progettata per apprendere una rappresentazione compressa dell’input, attraverso un processo di codifica e successiva decodifica, avente l’obiettivo di ricostruire fedelmente l’input ricevuto: $h_\theta (x) \approx x$. Sebbene questa formulazione possa risultare banale e apparentemente inutile, il valore dell'autoencoder risiede nella sua capacità di apprendere rappresentazioni utili dei dati, grazie a specifici vincoli architetturali. In particolare, l’apprendimento di una funzione identità approssimata, diventa un compito non banale, se si impongono vincoli strutturali quali:
+Un \textbf{Autoencoder}~\cite{Hinton2006Autoencoder}, è una rete neurale progettata per apprendere una rappresentazione compressa dell’input, attraverso un processo di codifica e successiva decodifica, avente l’obiettivo di ricostruire fedelmente l’input ricevuto minimizzando la perdita di ricostruzione: $h_\theta (x) \approx x$. Sebbene questa formulazione possa risultare banale e apparentemente inutile, il valore dell'autoencoder risiede nella sua capacità di apprendere rappresentazioni utili dei dati, grazie a specifici vincoli architetturali. In particolare, l’apprendimento di una funzione identità approssimata, diventa un compito non banale, se si impongono vincoli strutturali quali:
 
 \begin{enumerate}
     \item \textbf{Compressione del livello nascosto:} La dimensionalità dello strato nascosto è inferiore rispetto a quella dello strato di input, costringendo la rete a catturare le caratteristiche più rilevanti dell’informazione;
@@ -8,21 +8,21 @@ Un \textbf{Autoencoder} è una rete neurale progettata per apprendere una rappre
 \end{enumerate}
 
 \begin{figure}[h!]
-\centering
-\includegraphics[width=0.5\textwidth]{figure/AAutoencoder.png}
-\caption{Architettura semplice composta da tre layer di un Autoencoder, evidene è la caratteristica della compressione del livello nascosto.}
-\label{fig:AutoEnc}
+    \centering
+    \includegraphics[width=0.5\textwidth]{figure/AAutoencoder.png}
+    \caption{Architettura semplice composta da tre layer di un Autoencoder, evidene è la caratteristica della compressione del livello nascosto.}
+    \label{fig:AutoEnc}
 \end{figure}
 
 \section{U-Net}
 
-La \textbf{U-Net} è un’architettura di Deep Learning sviluppata per compiti di segmentazione semantica di immagini, con applicazioni rilevanti in ambito medico, come l’identificazione di lesioni o tumori. 
+Un'architettura che segue lo stesso principio di compressione e di successiva decompressione degli strati nascosti è quella delle \textbf{U-Net}~\cite{Ronneberger2015UNet}, esse sono un’architettura di Deep Learning sviluppata per compiti di segmentazione semantica di immagini, con applicazioni rilevanti in ambito medico, come l’identificazione di lesioni o tumori. Esse sono state introdotte da Ronneberger et al., 2015, e nasce come variante convoluzionale dell’Autoencoder applicata alla segmentazione di immagini, generando una maschera al di sopra dell'input fornito.
 
 \begin{Definizione}
     La segmentazione semantica è una tecnica di computer vision che assegna un'etichetta di classe (e.g "persona", "auto", "strada") a ogni singolo pixel di un'immagine, utilizzando algoritmi di Deep Learning.
 \end{Definizione}
 
-Quindi classificare ogni pixel dell’immagine in una determinata categoria, restituendone una mappa binaria o multiclasse. Un esempio è illustrato in Figura~\ref{fig:cell}.
+Pertanto l'U-Net risulta dedita a classificare ogni pixel dell’immagine in una determinata categoria, restituendone una mappa binaria o multiclasse. Un esempio è illustrato in Figura~\ref{fig:cell}.
 
 \begin{figure}[!ht]
 \centering
@@ -31,12 +31,12 @@ Quindi classificare ogni pixel dell’immagine in una determinata categoria, res
 \label{fig:cell}
 \end{figure}
 
-L’architettura della U-Net è suddivisa in tre componenti principali: \textit{Encoder}, \textit{Decoder} e \textit{Skip Connections}.
+L’architettura delle U-Net si discosta da quella degli Autoencoder per un componente in più, infatti essa è suddivisa in tre componenti principali: \textit{Encoder}, \textit{Decoder} e \textit{Skip Connections}.
 
 \begin{itemize}
-\item \textbf{Encoder:} Composto da blocchi convoluzionali e operazioni di downsampling, estrae progressivamente feature sempre più astratte;
-\item \textbf{Decoder:} Costituito da operazioni di upsampling e convoluzioni, ricostruisce l’immagine nella sua risoluzione originale;
-\item \textbf{Skip Connections:} Collegano simmetricamente gli strati dell’encoder con quelli del decoder, trasmettendo direttamente informazioni spaziali dettagliate, utili alla ricostruzione dell’output.
+    \item \textbf{Encoder:} Composto da blocchi convoluzionali e operazioni di downsampling, estrae progressivamente feature sempre più astratte;
+    \item \textbf{Decoder:} Costituito da operazioni di upsampling e convoluzioni, ricostruisce l’immagine nella sua risoluzione originale;
+    \item \textbf{Skip Connections:} Collegano simmetricamente gli strati dell’encoder con quelli del decoder, trasmettendo direttamente informazioni spaziali dettagliate, utili alla ricostruzione dell’output.
 \end{itemize}
 
 \begin{figure}[!ht]
@@ -46,43 +46,53 @@ L’architettura della U-Net è suddivisa in tre componenti principali: \textit{
     \label{fig:unet}
 \end{figure}
 
-Durante la fase di downsampling, le informazioni spaziali precise tendono a degradarsi. Tuttavia, grazie alle skip connections, le caratteristiche di basso livello, conservate nei primi layer convoluzionali, vengono riutilizzate nel decoder per preservare la localizzazione spaziale dei dettagli. Questo migliora sensibilmente la qualità dell'output segmentato.
+Durante la fase di downsampling, le informazioni spaziali precise tendono a degradarsi. Tuttavia, grazie alle Skip Connections, le caratteristiche di basso livello, conservate nei primi layer convoluzionali, vengono riutilizzate nel decoder per preservare la localizzazione spaziale dei dettagli. Questo migliora sensibilmente la qualità dell'output segmentato.
 
 \section{Limitazioni degli Autoencoder}
 
-Gli Autoencoder sono efficaci per compiti di compressione, riduzione del rumore e apprendimento non supervisionato. Tuttavia, presentano alcune limitazioni nel contesto generativo, in particolare, lo spazio latente appreso, non è strutturato per garantire la generazione di nuovi esempi coerenti.
+Gli Autoencoder sono efficaci per compiti di compressione, riduzione del rumore e apprendimento non supervisionato. Tuttavia, presentano alcune limitazioni nel contesto generativo, in particolare, lo spazio latente appreso, non risulta essere strutturato per poter garantire la generazione di nuovi esempi coerenti.
 
 \begin{figure}[!ht]
-\centering
-\includegraphics[width=\textwidth]{figure/EncLimit.png}
-\caption{Distribuzione irregolare nello spazio latente: regioni inutilizzate o contenenti rumore}
-\label{fig:enclimit}
+    \centering
+    \includegraphics[width=\textwidth]{figure/EncLimit.png}
+    \caption{Distribuzione irregolare nello spazio latente: regioni inutilizzate o contenenti rumore}
+    \label{fig:enclimit}
 \end{figure}
 
-L’encoder può infatti mappare gli input in regioni isolate del latent space, lasciando vaste aree vuote. Ciò implica che, campionando casualmente un punto in questo spazio, è probabile ottenere un output privo di significato. Inoltre, non vi è garanzia che interpolazioni lineari tra due punti "validi" generino anch’esse esempi coerenti.
+L’encoder può infatti mappare gli input in regioni isolate dello spazio latente, lasciando vaste aree vuote. Ciò implica che, campionando casualmente un punto in questo spazio, è probabile ottenere un output privo di significato, non vi è in più garanzia che interpolazioni lineari tra due punti "validi" generino anch’esse esempi coerenti, dunque ricadiamo in due principali problematiche una legata alla \textbf{continuità} e una alla \textbf{completezza}.
 
 \section{Variational Autoencoder (VAE)}
 
-Il \textbf{Variational Autoencoder} (VAE) è un’estensione probabilistica dell’autoencoder classico. Esso introduce una regolarizzazione nello spazio latente per consentire una generazione di dati coerente e continua. A differenza degli autoencoder tradizionali, i VAE non codificano l’input come un singolo punto nello spazio latente, ma come una distribuzione di probabilità. Il processo di training, pertanto coinvolge i seguenti passaggi:
+Il \textbf{Variational Autoencoder} (VAE) è un’estensione probabilistica dell’autoencoder classico. Esso introduce una regolarizzazione nello spazio latente per consentire una generazione di dati coerente e continua. A differenza degli autoencoder tradizionali, i VAE non codificano l’input come un singolo punto nello spazio latente, ma come una distribuzione di probabilità, da cui poi successivamente campionare e ricostruire. Il processo di training, pertanto coinvolge i seguenti passaggi:
 
 \begin{enumerate}
-    \item L’encoder mappa l’input in una distribuzione probabilistica (tipicamente gaussiana);
-    \item Viene campionato un punto da questa distribuzione;
-    \item Il decoder ricostruisce l’input a partire da tale punto;
-    \item L’errore di ricostruzione viene propagato all’indietro.
+    \item L’Encoder mappa l’input in una distribuzione probabilistica appresa dai dati, in uno spazio latente (tipicamente gaussiana);
+    \item Viene campionata una variabile latente da questa distribuzione:
+        \[
+            z\sim p(z)= \mathcal{N}(\mu_x,\sigma_x)
+        \]
+        \item Si calcola la Kullback Leibler Divergence per aggiungere un termine di regolarizzazione alla funzione di costo fra la distribuzione dello spazio latente e la distribuzione normale:
+        \[ \operatorname{KL}[\mathcal{N}(\mu_x,\sigma_x),\mathcal{N}(0,I)]\]
+    \item Il Decoder genera un dato $x$ a partire da $z$ augurandosi che ottenga il valore iniziale:
+        \[
+            x \sim p_{\theta}(x|z)
+        \]
+    \item L’errore di ricostruzione successivamente viene propagato all’indietro.
 \end{enumerate}
 
-La loss function del VAE combina due componenti, uno è il termine di ricostruzione che penalizza la differenza tra input e output, l'altro è un termine di regolarizzazione, costituito dalla divergenza di Kullback-Leibler tra la distribuzione appresa e una distribuzione normale standard.
+La funzione di costo del VAE dunque combina due componenti, uno è il termine di ricostruzione che penalizza la differenza tra input e output, l'altro è un termine di regolarizzazione, costituito dalla divergenza di Kullback-Leibler tra la distribuzione appresa e una distribuzione normale standard.
 
-\begin{equation}
+\begin{equation*}
     \begin{split}
-    \mathcal{L} = \| x - \hat{x}\|^2 + \operatorname{KL}[\mathcal{N}(\mu_x,\sigma_x), \mathcal{N}(0,\operatorname{I})] =\\= \|x-\operatorname{d}(z)\|^2 + \operatorname{KL}[\mathcal{N}(\mu_x,\sigma_x), \mathcal{N}(0, \operatorname{I})]
+    L = \| x - \hat{x}\|^2 + \operatorname{KL}[\mathcal{N}(\mu_x,\sigma_x)\,,\, \mathcal{N}(0,\operatorname{I})] =\\= \|x-\operatorname{D}(z)\|^2 + \operatorname{KL}[\mathcal{N}(\mu_x,\sigma_x)\,,\, \mathcal{N}(0, \operatorname{I})]
     \end{split}
-\end{equation}
+\end{equation*}
+
+Dove il passaggio matematico da $\hat{x}$ a $\operatorname{D}(z)$, vuole rappresentare semplicemente che la stima è stata ottenuta sottoponendo $z$ al Decoder della nostra architettura.
 
 \subsection{Proprietà desiderate dello spazio latente}
 
-Un buono spazio latente per la generazione di dati deve soddisfare le seguenti proprietà:
+Un buono spazio latente per definirsi tale deve soddisfare ben due proprietà fondamentali, in modo tale da garantire una corretta generazione dei dati:
 
 \begin{itemize}
     \item \textbf{Continuità:} Piccole variazioni nel latent space devono produrre output simili;
@@ -99,44 +109,61 @@ Tali proprietà non sono garantite automaticamente poiché si incorre in diverse
 \end{itemize}
 
 \begin{figure}[!ht]
-\centering
-\includegraphics[width=\textwidth]{figure/RegEnc.png}
-\caption{Effetti della regolarizzazione all'interno dello spazio latente, con la mancanza di essa (a sinistra) e la presenza della stessa (a destra).}
-\label{fig:regEnc}
+    \centering
+    \includegraphics[width=\textwidth]{figure/RegEnc.png}
+    \caption{Effetti della regolarizzazione all'interno dello spazio latente, con la mancanza di essa (a sinistra) e la presenza della stessa (a destra).}
+    \label{fig:regEnc}
 \end{figure}
 
 \section{Visione probabilistica dei VAE}
 
-Consideriamo $x$ un input e $z$ una variabile latente. L’obiettivo del VAE è apprendere un modello generativo che consenta di generare nuovi campioni $x$ campionando da una distribuzione a priori su $z$, tipicamente $\mathcal{N}(0, I)$. La generazione avviene tramite:
+Per poter comprendere al meglio perché si giunge all'utilizzo della Kullback Leibler Divergence, è opportuno analizzare la visione probabilistica del modello, consideriamo $x$ un input e $z$ una variabile latente. L’obiettivo del VAE è apprendere un modello generativo che consenta di generare nuovi campioni $x$ campionando da una distribuzione a priori su $z$, tipicamente $\mathcal{N}(0, I)$. Ci sono varie probabilità che entrano in gioco, ognuna rappresentativa di una caratteristica specifica:
 
 \begin{itemize}
-    \item Campionamento di $z \sim p(z)$;
-    \item Campionamento di $x \sim p(x|z)$.
+    \item $p(x)\rightarrow$ Probabilità di osservare $x$ rispetto a tutti i possibili parametri;
+    \item $ p(z)\rightarrow$ Distribuzione nello spazio latente;
+    \item $p(x|z)\rightarrow$ Decoder probabilistico, da cui vengono campionati i valori di $x$;
+    \item $p(z|x)\rightarrow$ Encoder probabilistico.
 \end{itemize}
 
-La distribuzione $p(x|z)$ è il \textit{decoder probabilistico}, mentre $p(z|x)$ è l'\textit{encoder probabilistico}. Quest’ultima risulta spesso intrattabile poiché implica il calcolo dell’integrale di marginalizzazione:
+La distribuzione di probabilità $p(x)$ risulta essere la più complicata da calcolare, poiché cerca all'interno della distribuzione di dati in input, i quali possono rappresentare qualsiasi cosa. Tutte queste distribuzioni di probabilità possone essere facilmente essere interconnesse fra loro grazie al Teorema di Bayes:
 
-\begin{equation}
-    p(z|x) = \frac{p(x|z),p(z)}{p(x)} \quad,\quad p(x) = \int p(x|z),p(z),dz
-\end{equation}
+\[
+    p(z|x) = \frac{p(x|z)\,p(z)}{p(x)}
+\]
+L'elemento più difficoltoso da calcolare è proprio l'elemento presente al denominatore, in quanto come già anticipato prima, porterebbe a calcolare un integrale molto complesso:
+\[
+    \log p(x) = \log\int p(x|u)\,p(u)\,du
+\]
 
 \subsection{Inferenza variazionale}
 
-Per affrontare questa difficoltà, si ricorre all’\textbf{inferenza variazionale}, approssimando $p(z|x)$ con una distribuzione $q_x(z)$ scelta all’interno di una famiglia parametrica (e.g gaussiana). La media e la varianza di $q_x(z)$ vengono apprese tramite funzioni $g(x)$ e $h(x)$:
+Per affrontare questa difficoltà, si ricorre all’\textbf{Inferenza Variazionale}, effettuando delle assunzioni e poi creando una distribuzione $q_x(z)$ scelta all’interno di una famiglia parametrica (e.g gaussiana), portandola ad essere l'approssimazione della distribuzione di probabilità $p(z|x)$.  Le due assunzioni sono le seguenti:
 
-\begin{equation}
-    \max_{(f,g,h)} \left( \mathbb{E}_{z\sim q_x}\left[-\frac{|x - f(z)|^2}{2c}\right] - \operatorname{KL}(q_x(z),|,p(z)) \right)
-\end{equation}
+\begin{itemize}
+    \item $p(z)=\mathcal{N}(0,I)$
+    \item $p(x|z)=\mathcal{N}(f(z),cI)$ con $f\in F$, una generica famiglia di funzioni e $c>0$
+\end{itemize}
 
-L’obiettivo è minimizzare la distanza tra $q_x(z)$ e $p(z)$, garantendo dunque una buona ricostruzione dell’input.
+La distribuzione $q_x(z)$ è costituita da due funzioni $g(x)$ e $h(x)$, rispettivamente per la media e per la varianza della distribuzione gaussiana. Il mio obbiettivo diventa minimizzare la KL Divergence fra questa approssimazione e la funzione $p(z|x)$, così da trovare la migliore approssimazione delle due funzioni $g^*,h^*$, che mi permettino di ottenere una buona distribuzione approssimata. Seguendo questa strategia seguiremo dunque i passaggi qui di seguito:
+
+\begin{equation*}
+\begin{split}
+    (g^*,h^*) = \arg\min\,\left(\operatorname{KL}(q_x(z),p(z|x)\right)=\\
+        =\arg\min\,\left(\mathbb{E}_{z\sim q_x}(\log q_x(z)) - \mathbb{E}_{z\sim q_x}\left(\log\frac{p(x|z)p(z)}{p_(x)}\right)\right)=\\ =\arg\min\,(\mathbb{E}_{z\sim q_x}(\log q_x(z)) - \mathbb{E}_{z\sim q_x}(\log p(z))\\- \mathbb{E}_{z\sim q_x}(\log p(x|z))+ \mathbb{E}_{z\sim q_x}(\log p(x)))=\\=\arg\max\,\left(\mathbb{E}_{z\sim q_x}(\log p(x|z) - \operatorname{KL}(q_x(z),p(z)\right)=\\
+        =\arg\max \left( \mathbb{E}_{z\sim q_x}\left[-\frac{\|x - f(z)\|^2}{2c}\right] - \operatorname{KL}(q_x(z),p(z)) \right)
+\end{split}
+\end{equation*}
+
+Ciò che avviene nei vari passaggi, è un'esplicitazione e compattamento della KL Divergence, uno spezzettamento della funzione logaritmo, seguendo le sue proprietà, per poi invertire il segno e dunque passare da un problema di minimizzazione a uno di massimizzazione. Questo problema di ottimizzazione alla fine diventa un'ottimizzazione a tre parametri, poiché dovremmo trovare anche il valore ottimale di $f^*$. 
 
 \subsection{Reparametrization Trick}
 
-Il campionamento da $q_x(z) = \mathcal{N}(\mu_x, \sigma_x)$ non è differenziabile, impedendo l’uso diretto della backpropagation. Tuttavia esiste un piccolo trucco tramite il così detto \textbf{reparametrization trick}: si campiona un vettore $\zeta \sim \mathcal{N}(0,I)$ e si imposta $z = \mu_x + \sigma_x \cdot \zeta$. Facendo in modo che il campionamento possa diventare un'operazione differenziabile.
+Il campionamento da $q_x(z) = \mathcal{N}(\mu_x, \sigma_x)$ non risulta essere differenziabile poiché casuale (sebbene non completamente), impedendo così l’utilizzo diretto della retropropagazione. Esiste per fortuna, un piccolo trucco chiamato \textbf{Reparametrization Trick}, il quale permette di arginare questa problematica: invece di campionare direttamente, effettuo un campionamento di un vettore $\zeta \sim \mathcal{N}(0,I)$ e imposterò $z = \mu_x + \sigma_x \odot \zeta$. Permettendo di far ricadere la casualità sul nostro parametro e non nelle funzioni parametrizzate in se, permettendomi di effettuare la Backpropagation senza alcun tipo di problema.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=\textwidth]{figure/RepTrick.png}
-\caption{Effetto del reparametrization trick nel rendere il campionamento differenziabile}
+\caption{Effetto del reparametrization trick nel rendere il campionamento differenziabile.}
 \label{fig:repTrick}
 \end{figure}

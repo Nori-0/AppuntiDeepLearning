@@ -1,68 +1,109 @@
 \chapter{Normalization Layers}
-La normalizzazione è una tecnica cruciale nell’addestramento di reti neurali profonde. Essa viene introdotta per migliorare l’ottimizzazione e stabilizzare l'apprendimento. In particolare, si fa riferimento alla \textbf{Batch Normalization (BN)} come metodo per affrontare problemi legati al cosiddetto \textit{internal covariate shift}.
+
+La normalizzazione rappresenta una delle tecniche più influenti e determinanti per l’addestramento stabile e rapido delle reti neurali profonde. L’idea alla base è quella di mantenere la distribuzione delle attivazioni intermedie entro range controllati, evitando che il flusso del gradiente diventi instabile. Tra i metodi di normalizzazione, la \textbf{Batch Normalization (BN)} ha avuto un impatto particolarmente significativo, poiché affronta efficacemente il fenomeno del cosiddetto \textit{internal covariate shift}.
 
 \section{Covariate Shift}
-Il \textbf{Covariate Shift} rappresenta un cambiamento nella distribuzione degli input tra il training e il test. Nelle CNN \textit{(Convolutional Neural Network)} (che vedremo nel capitolo successivo), i cambiamenti nei pesi degli strati inferiori modificano la distribuzione degli input per gli strati successivi, rallentandone pertanto l'addestramento. Questo fenomeno è noto come \textit{internal covariate shift}, un problema legato al fatto che ci si deve continuamente adattare a nuove distribuzioni, questa cosa inevitabilmente farà rallentare la convergenza.
 
-\subsection{Problemi di Ottimizzazione}
-La BN permette di normalizzare gli input degli strati intermedi, imitando un \textit{whitening} (decorrelazione con media zero e varianza unitaria). Questo processo è simile alla normalizzazione iniziale degli input delle reti, ma applicato a ogni batch durante l’addestramento.
+Il \textbf{Covariate Shift}~\cite{Shimodaira2000CovariateShift} descrive una condizione in cui la distribuzione degli input $P(X)$ varia tra fase di addestramento e fase di test, mentre la relazione condizionale $P(Y|X)$ rimane invariata. Formalmente:
+\[
+    P_{\text{train}}(X) \neq P_{\text{test}}(X), \quad \text{ma} \quad P_{\text{train}}(Y|X) = P_{\text{test}}(Y|X)
+\]
+Questo comporta che il modello, pur avendo appreso correttamente la funzione $P(Y|X)$, si trovi ad operare su una distribuzione di input differente da quella su cui è stato addestrato, con conseguente degrado delle prestazioni. Un esempio classico è quello di un modello di visione artificiale addestrato su immagini acquisite di giorno e testato su immagini notturne: le caratteristiche visive (input) cambiano, ma il concetto di "automobile" rimane invariato.
 
-\subsection{Perché il metodo classico non funziona}
-Un approccio classico, allenare una rete e successivamente effettuare la normalizzazione, porta a fallire. Questo accade perché la normalizzazione effettuata post hoc, rompe il flusso del gradiente portando a bias esplosivi. La disconnessione fra ottimizzazione e normalizzazione causa dei problemi, per esempio il gradiente non tiene contro dell'effetto della normalizzazione. Pertanto una soluzione proposta è quella di inserire un layer di normalizzazione (Figura~\ref{fig:bn-layer}) all'interno del modello, in questo modo il gradiente lo "vede" e può essere in grado di correggere i parametri della rete in maniera coerente.
-\begin{figure}
+\subsection{Covariate Shift Interno}
+Nelle reti profonde, un fenomeno analogo si verifica \textit{all’interno} del modello. Durante l’addestramento, gli aggiornamenti dei pesi nei layer inferiori modificano costantemente la distribuzione delle attivazioni fornite ai layer successivi. In questo modo, ogni strato si trova a dover continuamente riadattarsi a un input che cambia distribuzione. Questo effetto, viene chiamato \textbf{Internal Covariate Shift (ICS)}, rallenta la convergenza e rende l’ottimizzazione meno stabile. La \textbf{Batch Normalization} è stata introdotta proprio per mitigare questo problema, introducendo un layer di normalizzazione fra i vari layer (Figura~\ref{fig:bn-layer}), normalizzando così le attivazioni intermedie in modo che ogni layer riceva un input dalla distribuzione più stabile possibile, a differenza di ciò che accadeva normalmente effettuando una normalizzazione post-hoc. Nella normalizzazione effettuata senza \textit{Batch Normalization} il flusso del gradiente portava a bias espolsivi, e la disconnessione fra ottimizzazione e normalizzazione era una causa dei problemi, non tenendo conto proprio della normalizzazione in alcuni casi.
+
+\section{Batch Normalization}
+
+Adesso entriamo un po' più nell'aspetto matematico della \textbf{Batch Normalization}, la quale applica una normalizzazione per mini-batch, standardizzando ciascuna feature affinché abbia media zero e varianza unitaria:
+\[
+    \hat{x}_i^{(k)} = \frac{x_i^{(k)} - \mu_B^{(k)}}{\sqrt{\sigma_B^{2(k)} + \epsilon}}
+\]
+dove $\mu_B^{(k)}$ e $\sigma_B^{2(k)}$ sono rispettivamente la media e la varianza calcolate sul batch per la $k$-esima feature. Successivamente, si introducono due parametri appresi $\gamma^{(k)}$ e $\beta^{(k)}$ che ripristinano la capacità rappresentativa dello strato:
+\[
+    y_i^{(k)} = \gamma^{(k)} \hat{x}_i^{(k)} + \beta^{(k)}
+\]
+In questo modo, la rete può annullare la normalizzazione se necessario, garantendo flessibilità e capacità espressiva.
+
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.85\linewidth]{figure/BNlayer.png}
-    \caption{Inserimento di un layer utilizzando la Batch Normalization}
+    \caption{Inserimento di un layer di Batch Normalization fra un input layer e un hidden layer, i layer di Batch Normalization possono essere molteplici all'interno di un'architettura profonda, a volte sono presenti prima di ogni hidden layer.}
     \label{fig:bn-layer}
 \end{figure}
-\begin{quote}
-“Il layer BN può imparare anche l’identità, rendendo reversibile la normalizzazione se necessario.”
-\end{quote}
 
-Analiziamo passo passo, quali sono i passaggi effettuati per giungere a ciò che ottimizza al meglio la Normalizzazione:
+\subsection{Posizionamento nella rete}
+
+La BN è tipicamente inserita \textit{dopo} la trasformazione lineare o convoluzionale e \textit{prima} della funzione di attivazione, secondo lo schema:
+\[
+    \text{Linear/Conv} \rightarrow \text{BatchNorm} \rightarrow \text{ReLU}.
+\]
+Questo approccio viene ripetuto in molteplici punti della rete, poiché ogni layer può introdurre una variazione statistica nelle proprie attivazioni. Nelle architetture moderne come le \textit{ResNet}, gli strati di normalizzazione sono presenti in quasi ogni blocco convoluzionale.
+
+\subsection{Effetti e benefici}
+L’inserimento sistematico di BatchNorm comporta numerosi vantaggi pratici:
 \begin{itemize}
-  \item Ogni feature è normalizzata separatamente;
-  \item Si usa la normalizzazione Z-score;
-  \item Le stime di media e varianza vengono calcolate sul batch;
-  \item Sono presenti due parametri appresi: $\gamma$ (scaling) e $\beta$ (bias), per mantenere la capacità rappresentativa.
+  \item Stabilizza le distribuzioni di attivazione e riduce l’\textit{internal covariate shift};
+  \item Permette di utilizzare learning rate più elevati;
+  \item Riduce gradienti esplosivi o vanescenti;
+  \item Diminuisce la sensibilità all’inizializzazione dei pesi;
+  \item Introduce una forma implicita di regolarizzazione dovuta alla variabilità stocastica del batch;
+  \item Migliora la generalizzazione e la rapidità di convergenza.
 \end{itemize}
 
-Sia $x$ un input e $x^{(k)}$ la $k$-esima feature:
+\section{Varianti della Normalizzazione}
 
-\begin{equation*}
-    \mu^{(k)} = \frac{1}{m} \sum_{i=1}^m x_i^{(k)} \quad\quad \sigma^{2(k)} = \frac{1}{m} \sum_{i=1}^m (x_i^{(k)} - \mu^{(k)})^2
-\end{equation*}
-\begin{equation*}
-    \hat{x}_i^{(k)} = \frac{x_i^{(k)} - \mu^{(k)}}{\sqrt{\sigma^{2(k)} + \epsilon}} \quad\quad y_i^{(k)} = \gamma^{(k)} \hat{x}_i^{(k)} + \beta^{(k)}
-\end{equation*}
+Sebbene la Batch Normalization sia estremamente efficace, la sua dipendenza dalle statistiche di batch può diventare un limite, specialmente in presenza di batch molto piccoli o in contesti sequenziali. Sono quindi nate diverse varianti, che differiscono per le dimensioni sulle quali vengono calcolate media e varianza.
 
-Se non ci fossero i due parametri $\beta$ e $\gamma$ la distribuzione dei valori di output, avrebbe una media nulla e una varianza unitaria e questa applicazione non sarebbe utile, pertanto questi due valori mantengono la forza rappresentativa della rete neurale complessiva.
+\subsection{Layer Normalization}
+La \textbf{Layer Normalization (LN)}~\cite{Ba2016LayerNorm} normalizza le attivazioni considerando tutte le feature di un singolo campione:
+\[
+    \mu_L = \frac{1}{C \cdot H \cdot W} \sum_{c,h,w} x_{c,h,w} \qquad
+    \sigma_L^2 = \frac{1}{C \cdot H \cdot W} \sum_{c,h,w} (x_{c,h,w} - \mu_L)^2
+\]
+Ogni campione è quindi normalizzato indipendentemente dagli altri. È particolarmente efficace in architetture \textbf{RNN} e \textbf{Transformer}, dove i batch possono essere di dimensione variabile e l’indipendenza temporale è fondamentale.
+
+\subsection{Instance Normalization}
+La \textbf{Instance Normalization (IN)}~\cite{Ulyanov2016InstanceNorm} normalizza ciascun canale e ciascun campione separatamente:
+\[
+    \mu_{n,c} = \frac{1}{H \cdot W} \sum_{h,w} x_{n,c,h,w} \qquad
+    \sigma_{n,c}^2 = \frac{1}{H \cdot W} \sum_{h,w} (x_{n,c,h,w} - \mu_{n,c})^2
+\]
+Viene utilizzata prevalentemente in applicazioni di \textit{style transfer} e \textit{image-to-image translation}, poiché rimuove le informazioni di contrasto e illuminazione specifiche di ciascuna immagine.
+
+\subsection{Group Normalization}
+La \textbf{Group Normalization (GN)}~\cite{Wu2018GroupNorm} costituisce un compromesso tra BN e LN. I canali vengono suddivisi in $G$ gruppi, e la normalizzazione viene applicata all’interno di ciascun gruppo:
+\[
+    \mu_{g} = \frac{1}{(C/G) \cdot H \cdot W} \sum_{c \in g, h, w} x_{c,h,w}
+\]
+La GN è indipendente dalla dimensione del batch e risulta particolarmente efficace nelle CNN quando si utilizzano batch piccoli, dove la BN tende a produrre statistiche instabili.
 
 
-\subsubsection{Perché la Batch Normalization è efficace}
-\begin{itemize}
-  \item Rende più stabili le distribuzioni di attivazione;
-  \item Riduce l’effetto di gradienti esplosivi/vanescenti;
-  \item Permette l’uso di learning rate più alti;
-  \item Consente di usare attivazioni sature (e.g. sigmoid);
-  \item Diminuisce la necessità di tecniche di regularizzazione;
-  \item Riduce il tempo di training;
-  \item Migliora la generalizzazione;
-  \item Aumenta l'accuratezza.
-\end{itemize}
+\begin{table}
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{adjustbox}{width=\textwidth}
+    \begin{tabular}{lcccl}
+        \toprule
+        \textbf{Metodo} & \textbf{Media/Varianza su} & \textbf{Dip. dal batch} & \textbf{Vantaggi} & \textbf{Limiti} \\
+        \midrule
+        BatchNorm & Batch $\times$ Spaziale (per canale) & Sì & Stabilità e velocità & Instabile per batch piccoli \\
+        LayerNorm & Tutte le feature (per esempio) & No & Indipendente dal batch & Meno efficace in CNN \\
+        InstanceNorm & Spaziale (per canale e campione) & No & Rimuove info di stile & Perde dettagli discriminativi \\
+        GroupNorm & Gruppi di canali (per esempio) & No & Flessibile e stabile & Parametro $G$ da scegliere \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Confronto tra diversi tipi di normalizzazione.}
+    \label{tab:norm_comparison}
+\end{table}
 
-Esistono inoltre varie tipologie di normalizzazione ed essi differiscono semplicemente per la dimensione del gruppo di campioni usati per la normalizzazione, per esempio lungo i canali, i batch presi in considerazioni o ancora la scelta di un singolo esempio.
+\section{Conclusioni}
 
-
-\subsection{Conclusioni}
-
-Sebbene la normalizzazione si sia dimostrata estremamente efficace nella pratica~\parencite{IoffeSzegedy2015BatchNorm}, le ragioni profonde del suo successo rimangono oggetto di dibattito nella comunità scientifica. L’ipotesi originale del \textit{covariate shift} interno, è stata messa in discussione da analisi successive~\parencite{Santurkar2018BNTheory}, che hanno mostrato come l’efficacia della normalizzazione derivi piuttosto dal miglioramento della geometria della funzione di costo e dalla maggiore stabilità durante l’ottimizzazione. In particolare:
-
-\begin{itemize}
-    \item Le reti che incorporano strati di normalizzazione risultano più semplici da ottimizzare, permettendo l’uso di tassi di apprendimento più elevati~\parencite{Santurkar2018BNTheory};
-    \item La normalizzazione introduce una forma di rumore stocastico dovuto alla variabilità delle statistiche di batch, che agisce come un meccanismo implicito di regolarizzazione~\parencite{Bjorck2018UnderstandingBN};
-    \item La procedura riduce la sensibilità all’inizializzazione dei pesi e stabilizza il processo di addestramento~\parencite{Bjorck2021BNStability};
-    \item Infine, ha ispirato numerose varianti che estendono tali benefici a contesti differenti~\parencite{Ba2016LayerNorm, Wu2018GroupNorm}.
-\end{itemize}
-
-Nel complesso, la normalizzazione ha reso le architetture neurali più robuste, permettendo di combinare liberamente diversi blocchi e di addestrare reti profonde anche in condizioni di forte malcondizionamento numerico.
+La normalizzazione ha avuto un impatto determinante nello sviluppo di reti sempre più profonde e stabili. Sebbene l’ipotesi iniziale dell’\textit{internal covariate shift} abbia fornito l’intuizione originale~\cite{IoffeSzegedy2015BatchNorm}, studi successivi~\cite{Santurkar2018BNTheory, Bjorck2018UnderstandingBN, Bjorck2021BNStability} hanno evidenziato che il successo di tali tecniche deriva principalmente dal miglioramento della geometria della funzione di costo e dalla stabilizzazione del flusso del gradiente. Oggi, l’uso di meccanismi di normalizzazione — sia in forma di \textit{Batch}, \textit{Layer}, \textit{Instance} o \textit{Group} — rappresenta uno standard de facto nella progettazione di architetture neurali moderne, migliorando la generalizzazione e la robustezza dei modelli in quasi ogni dominio applicativo.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.85\textwidth]{figure/batchNormType.png}
+    \caption{Rappresentazione schematica delle principali tecniche di normalizzazione impiegate nei modelli di Deep Learning.}
+    \label{fig:placeholder}
+\end{figure}
